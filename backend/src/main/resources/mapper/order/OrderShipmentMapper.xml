@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.aftersales.order.mapper.OrderShipmentMapper">
+    <select id="findByOwnedOrder" resultType="com.example.aftersales.order.domain.po.OrderShipmentPO">
+        SELECT s.id, s.order_id, s.carrier, s.tracking_number, s.status,
+               s.shipped_at, s.delivered_at, s.created_at, s.updated_at
+        FROM order_shipment s JOIN trade_order o ON o.id = s.order_id
+        WHERE o.user_id = #{userId} AND s.order_id = #{orderId} ORDER BY s.id
+    </select>
+</mapper>

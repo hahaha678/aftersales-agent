@@ -1,5 +1,8 @@
-package com.example.aftersales.common.api;
+package com.example.aftersales.common.handler;
 
+import com.example.aftersales.common.domain.vo.ApiError;
+import com.example.aftersales.common.exception.ContractNotImplementedException;
+import com.example.aftersales.common.filter.RequestIdFilter;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,6 +18,18 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(com.example.aftersales.common.exception.ApiRequestException.class)
+    ResponseEntity<Object> businessRequest(com.example.aftersales.common.exception.ApiRequestException ex, WebRequest request) {
+        return ResponseEntity.status(ex.status()).body(error(ex.status(), ex.code(), ex.getMessage(), request, List.of()));
+    }
+
+    @ExceptionHandler(com.example.aftersales.identity.service.AuthFailure.class)
+    ResponseEntity<Object> authentication(com.example.aftersales.identity.service.AuthFailure ex, WebRequest request) {
+        var builder = ResponseEntity.status(ex.status());
+        if (ex.status() == 401) builder.header(HttpHeaders.WWW_AUTHENTICATE, "Bearer");
+        return builder.body(error(ex.status(), ex.code(), ex.getMessage(), request, List.of()));
+    }
 
     @ExceptionHandler(ContractNotImplementedException.class)
     ResponseEntity<Object> notImplemented(ContractNotImplementedException ex, WebRequest request) {

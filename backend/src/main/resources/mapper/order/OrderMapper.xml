@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.aftersales.order.mapper.OrderMapper">
+    <sql id="columns">id, user_id, order_number, status, paid_amount, currency, created_at, paid_at, signed_at, updated_at</sql>
+    <sql id="userFilter">
+        WHERE user_id = #{userId}
+        <if test="status != null">AND status = #{status}</if>
+        <if test="orderNumber != null">AND order_number = #{orderNumber}</if>
+    </sql>
+    <select id="findOwnedById" resultType="com.example.aftersales.order.domain.po.OrderPO">
+        SELECT <include refid="columns"/> FROM trade_order WHERE id = #{orderId} AND user_id = #{userId}
+    </select>
+    <select id="findPageByUser" resultType="com.example.aftersales.order.domain.po.OrderPO">
+        SELECT <include refid="columns"/> FROM trade_order
+        <include refid="userFilter"/>
+        ORDER BY created_at DESC, id DESC LIMIT #{limit} OFFSET #{offset}
+    </select>
+    <select id="countByUser" resultType="long">
+        SELECT COUNT(*) FROM trade_order <include refid="userFilter"/>
+    </select>
+</mapper>

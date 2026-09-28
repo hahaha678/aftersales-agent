@@ -1,4 +1,4 @@
-package com.example.aftersales.common.api;
+package com.example.aftersales.common.exception;
 
 /** Temporary boundary: remove a throw only when the corresponding service is implemented. */
 public class ContractNotImplementedException extends RuntimeException {

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.aftersales.order.mapper.OrderItemMapper">
+    <sql id="columns">i.id, i.order_id, i.sku_id, i.product_name, i.specification, i.quantity, i.paid_amount, i.created_at</sql>
+    <select id="findByOwnedOrder" resultType="com.example.aftersales.order.domain.po.OrderItemPO">
+        SELECT <include refid="columns"/> FROM order_item i JOIN trade_order o ON o.id = i.order_id
+        WHERE o.user_id = #{userId} AND i.order_id = #{orderId} ORDER BY i.id
+    </select>
+    <select id="findByOwnedOrders" resultType="com.example.aftersales.order.domain.po.OrderItemPO">
+        SELECT <include refid="columns"/> FROM order_item i JOIN trade_order o ON o.id = i.order_id
+        WHERE o.user_id = #{userId}
+        <choose>
+            <when test="orderIds != null and !orderIds.isEmpty()">
+                AND i.order_id IN
+                <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">#{orderId}</foreach>
+            </when>
+            <otherwise>AND 1 = 0</otherwise>
+        </choose>
+        ORDER BY i.order_id, i.id
+    </select>
+</mapper>

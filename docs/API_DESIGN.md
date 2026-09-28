@@ -2,8 +2,8 @@
 
 状态：待用户检查。Controller/DTO/OpenAPI 注解是字段契约来源；本文记录统一规则与业务语义。
 代码现按 controller、service、mapper、domain 分层；domain 内区分 dto、po、query、vo。响应对象使用 VO 后缀，订单列表条件封装为 OrderPageQuery；接口 URL 和 JSON 字段不变。详见 CODE_STRUCTURE.md。
-本轮无业务表、Service 或 Repository 实现，不操作真实订单，也未实现登录或鉴权。
-合法业务请求返回 HTTP 501，格式或字段不合法返回 400。Swagger 中的成功、401、404 等响应表示后续目标，不能视作当前能力。
+用户、会话、订单和物流表及六组 Mapper/PO 已实现。local 模式已实现登录、当前用户、注销、Bearer 认证，以及订单分页、详情和物流查询，见 AUTHENTICATION.md、ORDER_QUERIES.md。
+scaffold 模式的合法业务请求仍返回 501。local 模式身份接口返回实际 201/200/204，订单查询成功返回 200；认证失败为 401，认证依赖不可用为 503，订单不存在或越权为 404。
 
 ## 一、检查入口
 
@@ -124,13 +124,14 @@ availableAftersalesQuantity 只表示数量可用值，仍需售后资格接口�
 | 401 | AUTHENTICATION_FAILED | 登录凭据错误 | 目标 |
 | 401 | UNAUTHENTICATED | 缺少、过期或失效会话 | 目标 |
 | 403 | FORBIDDEN | 后续客服操作角色不足 | 后续接口 |
-| 404 | RESOURCE_NOT_FOUND | 资源不存在或当前用户不可访问 | 订单业务待实现 |
+| 404 | RESOURCE_NOT_FOUND | 资源不存在或当前用户不可访问 | local 订单详情与物流查询 |
 | 405 | METHOD_NOT_ALLOWED | 不支持的 HTTP 方法 | 已实现 |
 | 409 | STATE_CONFLICT | 后续申请状态、数量或版本冲突 | 后续接口 |
 | 415 | UNSUPPORTED_MEDIA_TYPE | 请求媒体类型不支持 | 已实现 |
-| 501 | NOT_IMPLEMENTED | 已定义但尚未实现的业务接口 | 当前所有业务接口 |
+| 501 | NOT_IMPLEMENTED | 契约占位 | scaffold 所有业务接口 |
+| 503 | AUTH_SERVICE_UNAVAILABLE | 认证依赖不可用，可重试 | local 认证链路 |
 
-接口实现阶段需要保持相同错误结构，包括认证过滤器中的错误。当前没有鉴权功能，Swagger 锁形图标仅表示目标认证要求。
+local 模式中 Controller 与认证过滤器使用相同错误结构，并携带请求 ID。scaffold 模式不进行真实鉴权，供检查接口契约。
 
 ## 五、之后的设计批次（尚未创建 Controller）
 
