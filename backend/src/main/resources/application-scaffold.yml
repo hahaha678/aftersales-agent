@@ -1,0 +1,9 @@
+# Skeleton mode only. UP here does not mean MySQL or the model was verified.
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+      - org.springframework.boot.flyway.autoconfigure.FlywayAutoConfiguration
+info:
+  app:
+    mode: scaffold

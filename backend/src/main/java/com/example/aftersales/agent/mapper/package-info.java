@@ -1,0 +1,4 @@
+/**
+ * agent 模块的 mapper 层；具体类型按开发阶段添加。
+ */
+package com.example.aftersales.agent.mapper;
