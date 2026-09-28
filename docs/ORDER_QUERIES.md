@@ -37,7 +37,7 @@ OrderService 使用只读、REPEATABLE_READ 事务，使一次调用中的总数
 - ID、SKU ID 输出为字符串；金额用 BigDecimal 转为两位小数字符串，保持整行/整单实付口径。
 - DATETIME 按 UTC 转为带偏移 ISO-8601；未支付、未签收的时间返回 null。
 - totalQuantity 为当前订单商品购买数量合计。
-- availableAftersalesQuantity 当前等于购买数量，因为尚未建立售后申请和占用记录。该字段不是资格判断结果；接入售后后必须扣除有效占用和已处理数量。
+- availableAftersalesQuantity 为购买数量减去 PENDING/APPROVED 售后申请占用；REJECTED/CANCELLED 不占用。该字段不是资格判断结果，仍需检查签收时间和期限，见 AFTERSALES.md。
 
 ## 验证范围
 

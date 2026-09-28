@@ -1,0 +1,38 @@
+CREATE TABLE aftersale_request (
+ id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ user_id BIGINT NOT NULL,
+ order_id BIGINT NOT NULL,
+ order_item_id BIGINT NOT NULL,
+ request_key VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ quantity INT NOT NULL,
+ amount DECIMAL(12,2) NOT NULL COMMENT '申请金额，不代表已退款',
+ reason VARCHAR(40) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ description VARCHAR(1000) NOT NULL,
+ status VARCHAR(24) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ rule_version VARCHAR(32) NOT NULL DEFAULT 'RETURN_7D_V1',
+ created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+ updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+ UNIQUE KEY uk_aftersale_request_key (user_id, request_key),
+ KEY idx_aftersale_user_time (user_id, created_at DESC, id DESC),
+ KEY idx_aftersale_status_time (status, created_at DESC, id DESC),
+ KEY idx_aftersale_item_status (order_item_id, status),
+ CONSTRAINT fk_aftersale_user FOREIGN KEY (user_id) REFERENCES app_user(id),
+ CONSTRAINT fk_aftersale_order FOREIGN KEY (order_id) REFERENCES trade_order(id),
+ CONSTRAINT fk_aftersale_item FOREIGN KEY (order_item_id) REFERENCES order_item(id),
+ CONSTRAINT ck_aftersale_quantity CHECK (quantity > 0),
+ CONSTRAINT ck_aftersale_amount CHECK (amount >= 0),
+ CONSTRAINT ck_aftersale_status CHECK (status IN ('PENDING','APPROVED','REJECTED','CANCELLED')),
+ CONSTRAINT ck_aftersale_reason CHECK (reason IN ('QUALITY','DAMAGED','WRONG_ITEM','NO_LONGER_NEEDED','OTHER'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE aftersale_event (
+ id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ request_id BIGINT NOT NULL,
+ actor_id BIGINT NOT NULL,
+ action VARCHAR(24) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ note VARCHAR(1000) NOT NULL,
+ occurred_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+ KEY idx_aftersale_event_time (request_id, occurred_at, id),
+ CONSTRAINT fk_aftersale_event_request FOREIGN KEY (request_id) REFERENCES aftersale_request(id),
+ CONSTRAINT fk_aftersale_event_actor FOREIGN KEY (actor_id) REFERENCES app_user(id),
+ CONSTRAINT ck_aftersale_event_action CHECK (action IN ('SUBMITTED','APPROVED','REJECTED','CANCELLED'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

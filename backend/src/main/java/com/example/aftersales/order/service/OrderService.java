@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnProperty(name = "app.auth.enabled", havingValue = "true")
 @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
 public class OrderService {
+    private final com.example.aftersales.aftersales.mapper.AftersaleMapper aftersales;
     private final CurrentUserService currentUser;
     private final OrderMapper orders;
     private final OrderItemMapper items;
@@ -30,7 +31,8 @@ public class OrderService {
     private final ShipmentEventMapper events;
 
     public OrderService(CurrentUserService currentUser, OrderMapper orders, OrderItemMapper items,
-            OrderShipmentMapper shipments, ShipmentEventMapper events) {
+            OrderShipmentMapper shipments, ShipmentEventMapper events, com.example.aftersales.aftersales.mapper.AftersaleMapper aftersales) {
+        this.aftersales = aftersales;
         this.currentUser = currentUser; this.orders = orders; this.items = items;
         this.shipments = shipments; this.events = events;
     }
@@ -66,8 +68,8 @@ public class OrderService {
         var order = owned(userId, parseId(orderId));
         var views = items.findByOwnedOrder(userId, order.getId()).stream().map(item -> new OrderItemVO(
                 item.getId().toString(), item.getSkuId().toString(), item.getProductName(), item.getSpecification(),
-                item.getQuantity(), money(item.getPaidAmount()), item.getQuantity())).toList();
-        // 当前没有售后申请表；可申请数量先等于购买数量，不代表通过售后资格校验。
+                item.getQuantity(), money(item.getPaidAmount()), item.getQuantity() - aftersales.occupied(item.getId()))).toList();
+        // 剩余数量扣除待审核及已通过申请的占用；期限和订单状态由资格接口判断。
         return new OrderDetailVO(order.getId().toString(), order.getOrderNumber(), order.getStatus(),
                 money(order.getPaidAmount()), order.getCurrency(), utc(order.getCreatedAt()),
                 utc(order.getPaidAt()), utc(order.getSignedAt()), views);

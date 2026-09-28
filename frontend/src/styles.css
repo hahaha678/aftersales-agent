@@ -167,3 +167,15 @@ footer span { margin-left: 15px; letter-spacing: 0; }
 @media (min-width: 1500px) { .sidebar { width: 250px; } main { padding-top: 50px; } }
 @media (max-width: 1000px) { .sidebar { width: 185px; padding: 28px 15px; } main { padding: 28px 24px; } .topbar { padding: 0 24px; } .hero-panel { padding: 27px; gap: 20px; } .journey { padding-left: 20px; } .module-card { padding: 17px; } }
 @media (max-width: 720px) { .workspace { display: block; } .sidebar { width: 100%; padding: 17px 20px 12px; border-right: 0; border-bottom: 1px solid #e4ebe7; } .brand { font-size: 16px; } .brand-icon { width: 35px; height: 35px; line-height: 32px; } .nav-label, .sidebar-note { display: none; } nav { display: flex; margin-top: 18px; justify-content: space-between; gap: 4px; } .nav-item { padding: 10px 8px; font-size: 12px; gap: 6px; } .topbar { height: 54px; padding: 0 20px; font-size: 11px; } main { padding: 26px 20px; } .hero-panel { grid-template-columns: 1fr; } .hero-panel h2 { font-size: 25px; } .journey { padding: 24px 0 0; border-left: 0; border-top: 1px solid #42665a; } .module-grid { grid-template-columns: 1fr; } .section-heading { align-items: flex-start; flex-direction: column; } .connection-panel { align-items: flex-start; flex-direction: column; } footer { padding: 0 20px 25px; } }
+
+/* Aftersales forms and audit records */
+.aftersale-form { max-width: 780px; }
+.aftersale-form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.aftersale-form select, .aftersale-form input:not([type=checkbox]), .aftersale-form textarea { margin-bottom: 20px; }
+textarea { width: 100%; font: inherit; padding: 12px; border: 1px solid #d7e1da; border-radius: 7px; resize: vertical; }
+.check-label { display: flex; align-items: center; gap: 10px; line-height: 1.8; margin: 16px 0; }
+.check-label input { width: 18px; min-height: 18px; flex-shrink: 0; }
+.eligibility-row { display: flex; flex-wrap: wrap; gap: 15px; padding: 18px 0; border-bottom: 1px solid #edf1ec; font-size: 13px; }
+.eligible { color: #386b4c; }
+.preserve-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+@media(max-width:720px){ .sidebar nav { flex-wrap: wrap; } .nav-item { white-space: nowrap; } .detail-heading { flex-wrap: wrap; gap: 12px; } }

@@ -26,11 +26,11 @@ async function signOut() {
     <aside class="sidebar">
       <RouterLink to="/" class="brand"><span class="brand-icon">a.</span><span>售后助手<small>AFTERCARE</small></span></RouterLink>
       <p class="nav-label">我的服务</p>
-      <nav aria-label="主导航"><RouterLink v-for="item in navigation" :key="item.to" :to="item.to" class="nav-item" active-class="active"><span aria-hidden="true">{{ item.symbol }}</span>{{ item.label }}</RouterLink></nav>
+      <nav aria-label="主导航"><RouterLink v-for="item in navigation" :key="item.to" :to="item.to" class="nav-item" active-class="active"><span aria-hidden="true">{{ item.symbol }}</span>{{ item.label }}</RouterLink><RouterLink v-if="session.user?.role === 'STAFF'" to="/staff/aftersales" class="nav-item" active-class="active">✓ 客服审核</RouterLink></nav>
       <div class="sidebar-note"><span class="dot"></span> 每一步，都有回应<small>从一次购买，到一份安心。</small></div>
     </aside>
     <div class="main-area">
-      <header class="topbar"><span>电商智能售后工作台</span><div v-if="session.token" class="account-area"><span class="avatar" aria-hidden="true">{{ (session.user?.displayName || '我').slice(0, 1) }}</span><span>{{ session.user?.displayName || '当前账户' }}<small v-if="session.user?.role === 'STAFF'">客服 · 我的订单视图</small></span><button class="text-button" :disabled="busy" @click="signOut">{{ busy ? '退出中…' : '退出登录' }}</button></div><RouterLink v-else class="button secondary small-button" to="/login">登录账户 →</RouterLink></header>
+      <header class="topbar"><span>电商智能售后工作台</span><div v-if="session.token" class="account-area"><span class="avatar" aria-hidden="true">{{ (session.user?.displayName || '我').slice(0, 1) }}</span><span>{{ session.user?.displayName || '当前账户' }}<small v-if="session.user?.role === 'STAFF'">客服</small></span><button class="text-button" :disabled="busy" @click="signOut">{{ busy ? '退出中…' : '退出登录' }}</button></div><RouterLink v-else class="button secondary small-button" to="/login">登录账户 →</RouterLink></header>
       <main id="main-content"><ErrorNotice :error="error" /><div v-if="session.verificationError" class="error-notice" role="alert">{{ session.verificationError }}<button class="text-button" @click="restoreSession">重试账户连接</button></div><RouterView /></main>
       <footer>AFTERCARE <span>以清晰的流程，连接每一步服务。</span></footer>
     </div>

@@ -11,7 +11,7 @@ async function submit() {
   try {
     await login(username.value, password.value)
     const next = route.query.redirect
-    await router.replace(typeof next === 'string' && /^\/orders(?:[/?]|$)/.test(next) ? next : '/orders')
+    await router.replace(typeof next === 'string' && /^\/(?:orders|aftersales|staff\/aftersales)(?:[/?]|$)/.test(next) ? next : '/orders')
   } catch (cause) { error.value = cause }
   finally { busy.value = false; password.value = '' }
 }

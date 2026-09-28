@@ -30,12 +30,16 @@ class ApiContractTest {
     }
 
     @Test
-    void openApiDescribesSixOperationsAndRealResponseTypes() throws Exception {
+    void openApiDescribesIdentityOrdersAndAftersales() throws Exception {
         var response = request("GET", "/v3/api-docs", null);
         assertThat(response.statusCode()).isEqualTo(200);
         JsonNode document = mapper.readTree(response.body());
         var paths = document.path("paths");
-        assertThat(paths.size()).isEqualTo(6);
+        assertThat(paths.size()).isEqualTo(13);
+        assertThat(paths.path("/api/aftersales").path("post").path("responses").has("201")).isTrue();
+        assertThat(paths.path("/api/staff/aftersales/{id}/review").path("post").path("security").isArray()).isTrue();
+        assertThat(document.path("components").path("schemas").path("AftersaleVO")
+                .path("properties").path("amount").path("type").asString()).isEqualTo("string");
         assertThat(paths.path("/api/orders").path("get").path("security").isArray()).isTrue();
         assertThat(paths.path("/api/sessions").path("post").path("security").isMissingNode()).isTrue();
         assertThat(paths.path("/api/sessions").path("post").path("responses").has("201")).isTrue();

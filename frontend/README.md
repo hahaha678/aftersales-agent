@@ -27,9 +27,12 @@ npm run dev
 | 公共布局 | 恢复用户信息、退出会话 | GET /api/users/me、DELETE /api/sessions/current |
 | /orders | 订单号精确查询、状态筛选、分页、空状态、失败重试 | GET /api/orders |
 | /orders/:id | 商品清单、实付金额、订单时间、物流轨迹 | GET /api/orders/{id}、GET /api/orders/{id}/shipments |
-| /assistant、/aftersales | 标明暂未开放的服务说明 | 尚未接入 |
+| /orders/:id/aftersales/new | 售后资格、商品数量、原因描述、确认提交 | 资格查询与 POST /api/aftersales |
+| /aftersales、/aftersales/:id | 本人记录、详情、撤销 | /api/aftersales 系列 |
+| /staff/aftersales、/staff/aftersales/:id | 客服跨用户查询和审核 | /api/staff/aftersales 系列 |
+| /assistant | 智能售后暂未开放 | 尚未接入 |
 
-列表筛选和页码保存在 URL，详情返回列表时保留。ID、金额采用字符串，避免大整数和小数精度损失。日期按浏览器本地时区展示。商品金额显示整行实付，当前不将 availableAftersalesQuantity 当作真实售后资格。
+列表筛选和页码保存在 URL，详情返回列表时保留。ID、金额采用字符串，避免大整数和小数精度损失。日期按浏览器本地时区展示。商品金额显示整行实付，availableAftersalesQuantity 已扣除售后占用，仍需通过资格接口校验状态和期限。
 
 物流独立显示加载和错误状态，失败时不隐藏已取得的商品信息。请求默认 10 秒超时；切换页面取消未完成请求，忽略过期响应。错误展示后端 message 和 requestId，方便定位日志。
 
@@ -75,3 +78,5 @@ npm run preview
 ```
 
 dist/ 为构建结果。preview 仅供预览，不是生产服务，也未配置后端代理。生产可通过 Nginx 托管 dist，将 /api/ 转发到 Spring Boot 并保留路径，对 history 路由配置 `try_files $uri $uri/ /index.html`。Vite server.proxy 不会写入 dist。本次未执行生产部署。
+
+售后模块已接入真实 REST API；重启后端完成 V3 迁移后即可联调。详细验收流程见 [AFTERSALES.md](../docs/AFTERSALES.md)。

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.aftersales.aftersales.mapper.AftersaleMapper">
+ <sql id="joined">SELECT a.*, o.order_number, i.product_name, i.specification FROM aftersale_request a JOIN trade_order o ON o.id=a.order_id JOIN order_item i ON i.id=a.order_item_id</sql>
+ <sql id="filter"><where><if test="userId != null">a.user_id=#{userId}</if><if test="status != null">AND a.status=#{status}</if></where></sql>
+ <select id="find" resultType="com.example.aftersales.aftersales.domain.po.AftersalePO"><include refid="joined"/> WHERE a.id=#{id}</select>
+ <select id="findByKey" resultType="com.example.aftersales.aftersales.domain.po.AftersalePO"><include refid="joined"/> WHERE a.user_id=#{userId} AND a.request_key=#{key}</select>
+ <select id="count" resultType="long">SELECT COUNT(*) FROM aftersale_request a <include refid="filter"/></select>
+ <select id="page" resultType="com.example.aftersales.aftersales.domain.po.AftersalePO"><include refid="joined"/> <include refid="filter"/> ORDER BY a.created_at DESC,a.id DESC LIMIT #{size} OFFSET #{offset}</select>
+</mapper>

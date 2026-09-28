@@ -1,4 +1,6 @@
-# RESTful API 契约草案 · 第一批
+# RESTful API 契约 · 用户、订单与售后
+
+售后第一版已实现，新增 8 个接口与规则见 [AFTERSALES.md](AFTERSALES.md)。下文第一批契约保留为用户和订单接口说明；后续规划中的售后资格、申请及审核现已落地，Agent 草稿尚未实现。
 
 状态：待用户检查。Controller/DTO/OpenAPI 注解是字段契约来源；本文记录统一规则与业务语义。
 代码现按 controller、service、mapper、domain 分层；domain 内区分 dto、po、query、vo。响应对象使用 VO 后缀，订单列表条件封装为 OrderPageQuery；接口 URL 和 JSON 字段不变。详见 CODE_STRUCTURE.md。

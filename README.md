@@ -1,6 +1,6 @@
 # 电商智能售后 Agent
 
-个人学习与简历项目。当前包含 Vue 3 + TypeScript 登录、订单列表与详情页面，MyBatis 数据访问层，MySQL + Redis 会话认证，以及当前用户订单和物流查询。前端已接入六个认证与订单接口；售后申请、RAG 和 Agent 对话待实现。验证范围见 frontend/README.md。
+个人学习与简历项目。当前包含 Vue 3 + TypeScript 登录、订单列表与详情页面，MyBatis 数据访问层，MySQL + Redis 会话认证，以及当前用户订单和物流查询。前端已接入六个认证与订单接口；售后申请、资格查询、撤销和客服审核已实现；退回物流、实际退款、RAG 和 Agent 对话待实现。验证范围见 frontend/README.md。
 
 ## 技术选择
 
@@ -116,3 +116,5 @@ ScaffoldSmokeTest 使用随机端口启动真实 HTTP 服务，验证无数据�
 
 已接入 Spring Data Redis + Lettuce，并提供带撤销标记的会话缓存组件。local 配置默认使用 127.0.0.1:6379，可通过 REDIS_HOST、REDIS_PORT、REDIS_PASSWORD 等环境变量调整。
 本机路径、配置与测试方法见 [Redis 接入说明](docs/REDIS.md)。缓存已接入登录与认证，故障策略和测试步骤见 [认证说明](docs/AUTHENTICATION.md)；scaffold 模式不要求 Redis 可用。
+
+售后第一版的规则、接口和联调步骤见 [售后说明](docs/AFTERSALES.md)。重启 local 后端会自动迁移 V3，新建售后申请和处理记录表。
