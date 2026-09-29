@@ -7,6 +7,16 @@ const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
+            path: '/staff/agent-runs',
+            component: () => import('../views/AgentMonitorView.vue'),
+            meta: { title: 'Agent 执行监控', requiresAuth: true, staff: true },
+        },
+        {
+            path: '/staff/agent-runs/:id',
+            component: () => import('../views/AgentMonitorView.vue'),
+            meta: { title: 'Agent 任务详情', requiresAuth: true, staff: true },
+        },
+        {
             path: '/tickets/new',
             component: () => import('../views/TicketCreateView.vue'),
             meta: { title: '转人工处理', requiresAuth: true },

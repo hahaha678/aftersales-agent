@@ -85,12 +85,17 @@ public interface ConversationMapper {
     List<MessagePO> messages(@Param("id") String id, @Param("before") long before);
 
     @Insert(
-        "INSERT INTO agent_tool_call(run_id,tool_name,status,duration_ms) VALUES(#{run},#{tool},#{status},#{duration})"
+        "INSERT INTO agent_tool_call(run_id,tool_name,status,duration_ms,call_index,started_at,input_summary,result_summary,error_code) VALUES(#{run},#{tool},#{status},#{duration},#{index},#{started},#{input},#{result},#{error})"
     )
     int audit(
         @Param("run") String run,
         @Param("tool") String tool,
         @Param("status") String status,
-        @Param("duration") long duration
+        @Param("duration") long duration,
+        @Param("index") int index,
+        @Param("started") java.time.LocalDateTime started,
+        @Param("input") String input,
+        @Param("result") String result,
+        @Param("error") String error
     );
 }

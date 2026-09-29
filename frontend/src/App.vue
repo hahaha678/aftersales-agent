@@ -66,6 +66,13 @@ async function signOut() {
                     active-class="active"
                     >☏ 客服工单</RouterLink
                 >
+                <RouterLink
+                    v-if="session.user?.role === 'STAFF'"
+                    to="/staff/agent-runs"
+                    class="nav-item"
+                    active-class="active"
+                    >▥ 执行监控</RouterLink
+                >
             </nav>
             <div class="sidebar-note">
                 <span class="dot"></span> 每一步，都有回应<small>从一次购买，到一份安心。</small>

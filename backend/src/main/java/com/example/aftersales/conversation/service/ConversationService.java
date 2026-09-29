@@ -142,8 +142,18 @@ public class ConversationService {
         return mapper.run(id);
     }
 
-    public void audit(String run, String tool, String status, long duration) {
-        mapper.audit(run, tool, status, duration);
+    public void audit(
+        String run,
+        String tool,
+        String status,
+        long duration,
+        int index,
+        java.time.LocalDateTime started,
+        String input,
+        String result,
+        String error
+    ) {
+        mapper.audit(run, tool, status, duration, index, started, input, result, error);
     }
 
     private static ApiRequestException missing() {

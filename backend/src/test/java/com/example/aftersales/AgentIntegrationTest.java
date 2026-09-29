@@ -70,13 +70,14 @@ class AgentIntegrationTest {
 
     @BeforeEach
     void fixture() throws Exception {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             String name = "agent_" + UUID.randomUUID().toString().replace("-", "");
             jdbc.update(
-                "INSERT INTO app_user(username,password_hash,display_name,role) VALUES(?,?,?,'CUSTOMER')",
+                "INSERT INTO app_user(username,password_hash,display_name,role) VALUES(?,?,?,?)",
                 name,
                 "{pbkdf2}4e33cdf6e04603b47b210789623049e7a052c02b3fd520506d562848c9c68a7cf060783cbf9060b8b2f05e25d2601c80",
-                "Agent 测试"
+                "Agent 测试",
+                i == 2 ? "STAFF" : "CUSTOMER"
             );
             users.add(jdbc.queryForObject("SELECT id FROM app_user WHERE username=?", Long.class, name));
             tokens.add(auth.login(new CreateSessionDTO(name, "DemoPass123!")).accessToken());
@@ -372,7 +373,126 @@ class AgentIntegrationTest {
                 Integer.class,
                 users.get(0)
             )
-        ).isEqualTo(10);
+        ).isEqualTo(11);
+    }
+
+    @Test
+    void monitorShowsBusinessToolFailuresWithoutExposingOtherUsersConversation() throws Exception {
+        String id = send("foreign");
+        await(id);
+        expect(call("GET", "/staff/agent-runs", null, -1), 401);
+        expect(call("GET", "/staff/agent-runs", null, 0), 403);
+        expect(call("GET", "/staff/agent-runs/" + id + "/tool-calls", null, 1), 403);
+        var detail = expect(call("GET", "/staff/agent-runs/" + id, null, 2), 200);
+        assertThat(detail.path("status").asString()).isEqualTo("SUCCEEDED");
+        assertThat(detail.path("toolCalls").asLong()).isEqualTo(1);
+        assertThat(detail.path("failedToolCalls").asLong()).isEqualTo(1);
+        assertThat(detail.path("inputTokens").asInt()).isEqualTo(12);
+        assertThat(detail.path("ownConversation").asBoolean()).isFalse();
+        assertThat(detail.path("userContent").isNull()).isTrue();
+        assertThat(detail.path("assistantContent").isNull()).isTrue();
+        var calls = expect(call("GET", "/staff/agent-runs/" + id + "/tool-calls", null, 2), 200);
+        assertThat(calls.get(0).path("status").asString()).isEqualTo("FAILED");
+        assertThat(calls.get(0).path("errorCode").asString()).isEqualTo("RESOURCE_NOT_FOUND");
+        assertThat(calls.get(0).path("callIndex").asInt()).isEqualTo(1);
+        assertThat(calls.get(0).path("startedAt").asString()).endsWith("Z");
+        assertThat(calls.toString()).doesNotContain("private product", tokens.get(0));
+        expect(call("GET", "/conversations/" + conversation + "/messages", null, 2), 404);
+    }
+
+    @Test
+    void monitorFiltersPagingAndExpiredStatusAreReadOnly() throws Exception {
+        String id = send("hello");
+        await(id);
+        var page = expect(
+            call("GET", "/staff/agent-runs?conversationId=" + conversation + "&status=SUCCEEDED&size=1", null, 2),
+            200
+        );
+        assertThat(page.path("total").asLong()).isEqualTo(1);
+        assertThat(page.path("items").get(0).path("id").asString()).isEqualTo(id);
+        assertThat(
+            expect(call("GET", "/staff/agent-runs?conversationId=" + conversation + "&page=2&size=1", null, 2), 200)
+                .path("items")
+                .size()
+        ).isZero();
+        assertThat(
+            expect(call("GET", "/staff/agent-runs?from=2100-01-01T00:00:00Z", null, 2), 200)
+                .path("total")
+                .asLong()
+        ).isZero();
+        for (String query : List.of(
+            "page=0",
+            "size=101",
+            "status=INVALID",
+            "conversationId=invalid",
+            "from=invalid",
+            "from=2026-09-30T00:00:00Z&until=2026-09-29T00:00:00Z"
+        ))
+            expect(call("GET", "/staff/agent-runs?" + query, null, 2), 400);
+        expect(call("GET", "/staff/agent-runs/" + UUID.randomUUID(), null, 2), 404);
+        jdbc.update(
+            "UPDATE agent_run SET status='RUNNING',created_at=UTC_TIMESTAMP()-INTERVAL 5 MINUTE,expires_at=UTC_TIMESTAMP()-INTERVAL 1 MINUTE,finished_at=NULL WHERE id=?",
+            id
+        );
+        var expired = expect(call("GET", "/staff/agent-runs/" + id, null, 2), 200);
+        assertThat(expired.path("status").asString()).isEqualTo("EXPIRED");
+        assertThat(expired.path("storedStatus").asString()).isEqualTo("RUNNING");
+        assertThat(expired.path("errorCode").asString()).isEqualTo("LEASE_EXPIRED");
+        assertThat(jdbc.queryForObject("SELECT status FROM agent_run WHERE id=?", String.class, id)).isEqualTo(
+            "RUNNING"
+        );
+        assertThat(
+            expect(call("GET", "/staff/agent-runs?status=EXPIRED&conversationId=" + conversation, null, 2), 200)
+                .path("total")
+                .asLong()
+        ).isEqualTo(1);
+        assertThat(
+            expect(call("GET", "/staff/agent-runs?status=RUNNING&conversationId=" + conversation, null, 2), 200)
+                .path("total")
+                .asLong()
+        ).isZero();
+    }
+
+    @Test
+    void monitorSupportsLegacyCallsAndOnlyShowsRawTextForTaskOwner() throws Exception {
+        String chat = expect(call("POST", "/conversations", Map.of("title", "客服自用"), 2), 201)
+            .path("id")
+            .asString();
+        String id = UUID.randomUUID().toString();
+        jdbc.update(
+            "INSERT INTO agent_run(id,conversation_id,user_id,request_key,status,user_content,assistant_content,model,expires_at,finished_at,error_message) VALUES(?,?,?,?,'FAILED','my-private-input','my-private-reply','test',UTC_TIMESTAMP()+INTERVAL 1 MINUTE,UTC_TIMESTAMP(),'private-exception-secret')",
+            id,
+            chat,
+            users.get(2),
+            id
+        );
+        jdbc.update(
+            "INSERT INTO agent_tool_call(run_id,tool_name,status,duration_ms) VALUES(?,'getMyOrder','FAILED',10)",
+            id
+        );
+        var own = expect(call("GET", "/staff/agent-runs/" + id, null, 2), 200);
+        assertThat(own.path("ownConversation").asBoolean()).isTrue();
+        assertThat(own.path("userContent").asString()).isEqualTo("my-private-input");
+        assertThat(own.path("assistantContent").asString()).isEqualTo("my-private-reply");
+        assertThat(own.path("errorCode").asString()).isEqualTo("EXECUTION_FAILED");
+        assertThat(own.toString()).doesNotContain("private-exception-secret");
+        var old = expect(call("GET", "/staff/agent-runs/" + id + "/tool-calls", null, 2), 200).get(0);
+        assertThat(old.path("inputSummary").isNull()).isTrue();
+        assertThat(old.path("callIndex").isNull()).isTrue();
+    }
+
+    @Test
+    void monitorRecordsBudgetRefusalAsNinthAttempt() throws Exception {
+        String id = send("budget");
+        await(id);
+        var calls = expect(call("GET", "/staff/agent-runs/" + id + "/tool-calls", null, 2), 200);
+        assertThat(calls.size()).isEqualTo(9);
+        for (int i = 0; i < 9; i++) assertThat(calls.get(i).path("callIndex").asInt()).isEqualTo(i + 1);
+        assertThat(calls.get(8).path("errorCode").asString()).isEqualTo("TOOL_BUDGET_EXCEEDED");
+        assertThat(calls.get(8).path("status").asString()).isEqualTo("FAILED");
+        assertThat(calls.get(0).path("resultSummary").asString())
+            .contains("characters")
+            .doesNotContain("private product");
     }
 
     @Test

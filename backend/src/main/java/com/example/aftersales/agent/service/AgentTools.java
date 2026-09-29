@@ -228,13 +228,18 @@ public class AgentTools {
 
             public String call(String input, ToolContext ignored) {
                 // 所有工具共用本轮预算；超过 8 次或任务取消后，不再进入业务服务。
-                if (calls.incrementAndGet() > 8 || !active.getAsBoolean()) throw new IllegalStateException(
-                    "工具调用预算已耗尽或任务已结束"
-                );
+                int callIndex = calls.incrementAndGet();
                 long start = System.nanoTime();
+                var startedAt = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC);
                 String state = "FAILED";
+                String errorCode = "TOOL_EXECUTION_FAILED",
+                    resultSummary = "未取得有效结果";
                 var previous = SecurityContextHolder.getContext();
                 try {
+                    if (callIndex > 8 || !active.getAsBoolean()) {
+                        errorCode = callIndex > 8 ? "TOOL_BUDGET_EXCEEDED" : "RUN_NOT_ACTIVE";
+                        throw new IllegalStateException("工具调用预算已耗尽或任务已结束");
+                    }
                     // Token 只保留在本次服务端闭包中，不进入模型参数、数据库或日志；每次工具重新验证。
                     var principal = sessions.authenticate(token);
                     // 工具在工作线程执行，不自动继承请求线程的登录上下文，需要显式设置。
@@ -248,7 +253,10 @@ public class AgentTools {
                     );
                     SecurityContextHolder.setContext(context);
                     // 再检查数据库中的状态和租约，避免内存仍存活但任务已失效时继续执行。
-                    if (!conversations.running(run)) throw new IllegalStateException("任务已结束");
+                    if (!conversations.running(run)) {
+                        errorCode = "RUN_NOT_ACTIVE";
+                        throw new IllegalStateException("任务已结束");
+                    }
                     events.accept("status", Map.of("message", progress(name)));
                     String result;
                     try {
@@ -262,17 +270,25 @@ public class AgentTools {
                         throw new IllegalStateException("工具暂不可用");
                     }
                     // 防止单次工具结果撑大模型上下文；这是字符长度上限，不是 Token 计数。
-                    if (result.length() > 18000) return JSON.writeValueAsString(
-                        Map.of("error", "RESULT_TOO_LARGE", "message", "结果过大，请缩小查询范围")
-                    );
-                    state = "SUCCEEDED";
+                    if (result.length() > 18000) {
+                        errorCode = "RESULT_TOO_LARGE";
+                        return JSON.writeValueAsString(
+                            Map.of("error", "RESULT_TOO_LARGE", "message", "结果过大，请缩小查询范围")
+                        );
+                    }
+                    errorCode = ToolAuditSummary.errorCode(result);
+                    resultSummary = ToolAuditSummary.result(result);
+                    state = errorCode == null ? "SUCCEEDED" : "FAILED";
                     return result;
                 } catch (ApiRequestException ex) {
+                    errorCode = ToolAuditSummary.code(ex.code());
                     // 业务拒绝作为结构化结果交给模型解释；登录失效则向上抛出，结束本轮任务。
                     return JSON.writeValueAsString(Map.of("error", ex.code(), "message", ex.getMessage()));
                 } catch (com.example.aftersales.identity.service.AuthFailure ex) {
+                    errorCode = "AUTH_FAILED";
                     throw ex;
                 } catch (IllegalArgumentException ex) {
+                    errorCode = "INVALID_ARGUMENT";
                     return JSON.writeValueAsString(
                         Map.of("error", "INVALID_ARGUMENT", "message", "工具参数格式错误，请检查字段")
                     );
@@ -280,7 +296,17 @@ public class AgentTools {
                     // 线程池会复用线程，无论成功失败都恢复原上下文，避免后续任务混用身份。
                     SecurityContextHolder.setContext(previous);
                     // 审计记录执行结果和耗时；默认 FAILED，只有正常返回才标记 SUCCEEDED。
-                    conversations.audit(run, name, state, (System.nanoTime() - start) / 1_000_000);
+                    conversations.audit(
+                        run,
+                        name,
+                        state,
+                        (System.nanoTime() - start) / 1_000_000,
+                        callIndex,
+                        startedAt,
+                        ToolAuditSummary.input(input),
+                        resultSummary,
+                        errorCode
+                    );
                 }
             }
         };

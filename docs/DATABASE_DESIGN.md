@@ -1,5 +1,7 @@
 # 用户与订单数据库设计 · 第一批
 
+V9 扩展 agent_tool_call：call_index、started_at、input_summary、result_summary、error_code；新调用按任务内序号唯一，旧记录新增字段允许空。增加任务时间/状态查询索引，详情仅按权限返回原始任务内容，见 [执行监控](AGENT_MONITORING.md)。
+
 V8 新增人工工单、处理事件、幂等请求映射和聊天快照四张表。未关闭会话生成列带唯一索引，避免同会话重复活动工单；工单解决后保留历史请求映射与快照，详见 [人工工单](SUPPORT_TICKETS.md)。
 
 V7 新增 `aftersale_refund` 记录模拟退款流水，扩展售后状态为 REFUND_PENDING、REFUND_FAILED、COMPLETED。退款请求键在单售后单内唯一，模拟渠道编号全局唯一；记录金额、前序失败请求键、场景、结果、操作者与时间。流水、售后状态和事件同事务写入。完成数量仍计入不可再申请数量，详见 [模拟退款](SIMULATED_REFUND.md)。
