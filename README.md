@@ -58,7 +58,7 @@ DB_PASSWORD=你的本地密码
 
 默认连接 127.0.0.1:3306/aftersales_agent，可通过 DB_HOST、DB_PORT、DB_NAME 修改。
 `.env.example` 是配置说明，Spring Boot 不会自动读取 `.env`；请通过 IDEA 或终端设置变量。
-首次 local 启动会执行 V1、V2 迁移，创建元数据表、用户/会话/订单/物流六张业务表和 Flyway 历史表。
+local 启动会执行尚未应用的 V1–V4 迁移，创建基础业务、售后、Agent 会话与草稿表及 Flyway 历史表。
 数据库不可用或迁移失败时启动应失败；不会自动切换到无数据库模式。
 不要同时启用 scaffold 和 local。已在隔离的 MySQL 8.0.43 实例验证迁移，尚未读取或使用你日常数据库的密码，也未迁移 3306 上的数据库。
 数据库使用 UTC 存储时间，API 返回带偏移的 ISO-8601 时间。
@@ -79,9 +79,9 @@ docs/                   开发清单、环境和验证记录
 
 ## 验证范围
 
-已通过 5 项后端测试和打包检查，并验证 scaffold 模式健康接口返回 UP。
+已通过 42 项后端测试和打包检查，包含隔离 MySQL / Redis 上的身份、订单、售后、Agent 集成测试和本地 DeepSeek 协议测试。
 ScaffoldSmokeTest 使用随机端口启动真实 HTTP 服务，验证无数据库和模型凭据时健康接口可用。
-另在隔离 MySQL 8.0.43 中验证 V1/V2 迁移、演示数据导入及数据库约束；具体记录见 docs/ENVIRONMENT.md。登录、订单业务及模型测试在对应模块开发时补齐。
+已在隔离 MySQL 8.0.43 中验证 V1–V4 迁移；2026-09-29 已完成首轮真实 DeepSeek 基线评测，10 个场景的自动业务检查通过，回复审阅仍发现语言和金额措辞问题，见 [基线报告](docs/evaluations/baseline-v1-20260929/REPORT.md)。这不代表完整的模型质量验收。
 
 开发范围见 [开发清单](docs/DEVELOPMENT_CHECKLIST.md)。
 
@@ -93,15 +93,15 @@ ScaffoldSmokeTest 使用随机端口启动真实 HTTP 服务，验证无数据�
 前端不放入 backend/src/main/resources/static，也不参与 Maven 打包，两个工程独立构建和启动。
 详细命令、目录职责与部署说明见 [前端 README](frontend/README.md)。
 
-## RESTful 接口设计（待检查）
+## RESTful 接口
 
 - 设计说明与接口清单：[docs/API_DESIGN.md](docs/API_DESIGN.md)。
 - Swagger UI：http://127.0.0.1:8080/swagger-ui.html 。
 - OpenAPI JSON：http://127.0.0.1:8080/v3/api-docs 。
-- 首批 6 个接口：创建/撤销会话、当前用户、订单分页、订单详情、物流查询。
-- 契约以 Controller、DTO 和 Swagger v3 注解为准；scaffold 合法请求返回 501，local 已实现三个身份接口和三个订单查询接口。
+- 身份、订单、售后、客服审核、Agent 会话与草稿接口已实现，OpenAPI 当前包含 24 个路径。
+- 契约以 Controller、DTO 和 Swagger v3 注解为准；scaffold 合法业务请求返回 501，local 启用业务实现。
 - local 登录会写入真实会话；请使用专用开发库和按文档手工导入的演示账号。
-- 构建验证：Maven verify 通过，5 项测试验证健康接口、文档结构、占位响应和输入校验。
+- 构建验证：Maven verify 通过，接口契约测试覆盖健康、文档结构、占位响应和输入校验。
 - 生产部署前通过 springdoc.api-docs.enabled=false、springdoc.swagger-ui.enabled=false 关闭文档，或纳入访问控制。
 
 ## 数据库设计（待检查）
@@ -110,7 +110,7 @@ ScaffoldSmokeTest 使用随机端口启动真实 HTTP 服务，验证无数据�
 - 建表脚本：[V2 迁移](backend/src/main/resources/db/migration/V2__create_identity_and_order_tables.sql)，保持 V1 不变。
 - 演示数据：[手动导入脚本](deploy/mysql/02-seed-demo-data.sql)，包含 3 个用户、7 个订单、8 条商品项、4 个包裹和 8 条轨迹，不创建会话。
 - 仅在专用开发库停机导入；必须显式设置 `@allow_demo_seed = 1`，首次要求业务表为空，重复执行保留已有数据。
-- 认证与订单查询 Service 已完成；测试方法见 [订单查询说明](docs/ORDER_QUERIES.md)。下一步联调 Vue 登录和订单页面。
+- 认证、订单查询、售后申请与审核及对应 Vue 页面已完成；订单测试方法见 [订单查询说明](docs/ORDER_QUERIES.md)。
 
 ## Redis 会话缓存准备
 
@@ -118,3 +118,9 @@ ScaffoldSmokeTest 使用随机端口启动真实 HTTP 服务，验证无数据�
 本机路径、配置与测试方法见 [Redis 接入说明](docs/REDIS.md)。缓存已接入登录与认证，故障策略和测试步骤见 [认证说明](docs/AUTHENTICATION.md)；scaffold 模式不要求 Redis 可用。
 
 售后第一版的规则、接口和联调步骤见 [售后说明](docs/AFTERSALES.md)。重启 local 后端会自动迁移 V3，新建售后申请和处理记录表。
+
+## DeepSeek 智能售后
+
+真实模型基线评测已提供 10 个场景、一键隔离运行脚本和自动检查报告，见 [评测说明](docs/AGENT_EVALUATION.md)。运行前需要当前终端可读取的 DeepSeek 密钥；模拟演练结果不作为真实模型成绩。
+
+已实现工具查询、多轮会话、SSE 回复、历史恢复、任务取消以及草稿确认建单。配置方式、执行边界和联调示例见 [Agent 接入说明](docs/AGENT.md)。后端设置 AI_ENABLED=true 和 DEEPSEEK_API_KEY 后重启，从前端“智能售后”进入；密钥不能放到 Vue 环境变量或 Git。V4 迁移自动执行，未配置模型不影响普通业务。RAG 政策检索、换货和实际退款尚未实现。

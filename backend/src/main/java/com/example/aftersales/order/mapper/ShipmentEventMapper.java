@@ -7,6 +7,5 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface ShipmentEventMapper {
-    List<ShipmentEventPO> findByOwnedShipment(@Param("userId") long userId,
-            @Param("shipmentId") long shipmentId);
+    List<ShipmentEventPO> findByOwnedShipment(@Param("userId") long userId, @Param("shipmentId") long shipmentId);
 }

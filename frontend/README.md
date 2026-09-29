@@ -67,7 +67,7 @@ npm run dev
 - 独立 5174/18081 临时 HTTP 测试服务：验证成功登录、刷新恢复用户、分页及末页按钮、状态筛选重置页码、详情返回保留条件、空结果、503 请求编号、重置恢复、商品清单、物流时间线及未发货空状态、注销。测试使用内存固定数据，没有写入用户数据库，也不注入正常 5173 服务。
 - 检查了桌面及移动端布局；正常开发入口为 5173，独立测试服务验证后关闭。
 
-后续增加售后/Agent 时，需同时补齐后端业务与前端交互。SSE 应独立封装流式读取，不使用当前只解析 JSON 的请求方法。
+智能售后已接入：AssistantView 展示会话、消息、进度和草稿确认卡片；api/agent.ts 独立封装带 Bearer 的 fetch SSE。断线后“刷新会话”会连接原任务，发送超时后重试沿用 requestKey。模型文本按纯文本渲染。
 
 ## 构建和部署
 
@@ -80,3 +80,5 @@ npm run preview
 dist/ 为构建结果。preview 仅供预览，不是生产服务，也未配置后端代理。生产可通过 Nginx 托管 dist，将 /api/ 转发到 Spring Boot 并保留路径，对 history 路由配置 `try_files $uri $uri/ /index.html`。Vite server.proxy 不会写入 dist。本次未执行生产部署。
 
 售后模块已接入真实 REST API；重启后端完成 V3 迁移后即可联调。详细验收流程见 [AFTERSALES.md](../docs/AFTERSALES.md)。
+
+Agent 需要 V4 迁移和后端 DeepSeek 配置，参见 [AGENT.md](../docs/AGENT.md)。不在浏览器保存模型密钥；未配置模型时禁用发送，原有订单和售后页面可继续使用。聊天历史持久化在 MySQL，退出登录清除页面内容和当前浏览器流连接。

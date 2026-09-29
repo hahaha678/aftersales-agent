@@ -1,26 +1,31 @@
 {
-  "name": "aftersales-agent-web",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "engines": {
-    "node": "^20.19.0 || >=22.12.0"
-  },
-  "scripts": {
-    "dev": "vite",
-    "type-check": "vue-tsc --noEmit",
-    "build": "npm run type-check && vite build",
-    "preview": "vite preview --host 127.0.0.1"
-  },
-  "dependencies": {
-    "vue": "3.5.43",
-    "vue-router": "4.6.4"
-  },
-  "devDependencies": {
-    "@types/node": "22.20.4",
-    "@vitejs/plugin-vue": "6.0.9",
-    "typescript": "5.9.3",
-    "vite": "8.3.1",
-    "vue-tsc": "3.3.11"
-  }
+    "name": "aftersales-agent-web",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "engines": {
+        "node": "^20.19.0 || >=22.12.0"
+    },
+    "scripts": {
+        "test": "node --test tests/*.test.mjs",
+        "dev": "vite",
+        "type-check": "vue-tsc --noEmit",
+        "build": "npm run type-check && vite build",
+        "preview": "vite preview --host 127.0.0.1",
+        "format": "prettier --plugin=prettier-plugin-java --write \"../backend/src/**/*.java\" \"src/**/*.{vue,ts,css}\" \"tests/*.mjs\" \"*.{ts,json,html}\" \"../backend/src/**/*.{yml,yaml}\" --ignore-path ../.prettierignore",
+        "format:check": "prettier --plugin=prettier-plugin-java --check \"../backend/src/**/*.java\" \"src/**/*.{vue,ts,css}\" \"tests/*.mjs\" \"*.{ts,json,html}\" \"../backend/src/**/*.{yml,yaml}\" --ignore-path ../.prettierignore"
+    },
+    "dependencies": {
+        "vue": "3.5.43",
+        "vue-router": "4.6.4"
+    },
+    "devDependencies": {
+        "@types/node": "22.20.4",
+        "@vitejs/plugin-vue": "6.0.9",
+        "prettier": "3.9.9",
+        "prettier-plugin-java": "2.11.0",
+        "typescript": "5.9.3",
+        "vite": "8.3.1",
+        "vue-tsc": "3.3.11"
+    }
 }

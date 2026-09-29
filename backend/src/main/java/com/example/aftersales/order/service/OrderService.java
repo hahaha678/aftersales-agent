@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnProperty(name = "app.auth.enabled", havingValue = "true")
 @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
 public class OrderService {
+
     private final com.example.aftersales.aftersales.mapper.AftersaleMapper aftersales;
     private final CurrentUserService currentUser;
     private final OrderMapper orders;
@@ -30,11 +31,20 @@ public class OrderService {
     private final OrderShipmentMapper shipments;
     private final ShipmentEventMapper events;
 
-    public OrderService(CurrentUserService currentUser, OrderMapper orders, OrderItemMapper items,
-            OrderShipmentMapper shipments, ShipmentEventMapper events, com.example.aftersales.aftersales.mapper.AftersaleMapper aftersales) {
+    public OrderService(
+        CurrentUserService currentUser,
+        OrderMapper orders,
+        OrderItemMapper items,
+        OrderShipmentMapper shipments,
+        ShipmentEventMapper events,
+        com.example.aftersales.aftersales.mapper.AftersaleMapper aftersales
+    ) {
         this.aftersales = aftersales;
-        this.currentUser = currentUser; this.orders = orders; this.items = items;
-        this.shipments = shipments; this.events = events;
+        this.currentUser = currentUser;
+        this.orders = orders;
+        this.items = items;
+        this.shipments = shipments;
+        this.events = events;
     }
 
     public OrderPageVO list(OrderPageQuery query) {
@@ -56,35 +66,89 @@ public class OrderService {
                 quantities.merge(item.getOrderId(), item.getQuantity(), Math::addExact);
             }
         }
-        var views = page.stream().map(order -> new OrderSummaryVO(
-                order.getId().toString(), order.getOrderNumber(), order.getStatus(),
-                quantities.getOrDefault(order.getId(), 0), money(order.getPaidAmount()),
-                order.getCurrency(), utc(order.getCreatedAt()))).toList();
+        var views = page
+            .stream()
+            .map(order ->
+                new OrderSummaryVO(
+                    order.getId().toString(),
+                    order.getOrderNumber(),
+                    order.getStatus(),
+                    quantities.getOrDefault(order.getId(), 0),
+                    money(order.getPaidAmount()),
+                    order.getCurrency(),
+                    utc(order.getCreatedAt())
+                )
+            )
+            .toList();
         return new OrderPageVO(views, query.getPage(), query.getSize(), total);
+    }
+
+    /** Agent 查询入口：数字为内部 ID，其余为完整业务订单号；不截取订单号中的数字。 */
+    public String resolveOwnedReference(String reference) {
+        if (reference == null || reference.isBlank() || reference.length() > 64) {
+            throw ApiRequestException.invalid("请提供订单 ID 或完整订单号，例如 DEMO-1002");
+        }
+        long userId = currentUser.requireUserId();
+        String value = reference.trim();
+        var order = value.matches("[0-9]+") ? owned(userId, parseId(value)) : orders.findOwnedByNumber(userId, value);
+        if (order == null) throw ApiRequestException.notFound();
+        return order.getId().toString();
     }
 
     public OrderDetailVO detail(String orderId) {
         long userId = currentUser.requireUserId();
         var order = owned(userId, parseId(orderId));
-        var views = items.findByOwnedOrder(userId, order.getId()).stream().map(item -> new OrderItemVO(
-                item.getId().toString(), item.getSkuId().toString(), item.getProductName(), item.getSpecification(),
-                item.getQuantity(), money(item.getPaidAmount()), item.getQuantity() - aftersales.occupied(item.getId()))).toList();
+        var views = items
+            .findByOwnedOrder(userId, order.getId())
+            .stream()
+            .map(item ->
+                new OrderItemVO(
+                    item.getId().toString(),
+                    item.getSkuId().toString(),
+                    item.getProductName(),
+                    item.getSpecification(),
+                    item.getQuantity(),
+                    money(item.getPaidAmount()),
+                    item.getQuantity() - aftersales.occupied(item.getId())
+                )
+            )
+            .toList();
         // 剩余数量扣除待审核及已通过申请的占用；期限和订单状态由资格接口判断。
-        return new OrderDetailVO(order.getId().toString(), order.getOrderNumber(), order.getStatus(),
-                money(order.getPaidAmount()), order.getCurrency(), utc(order.getCreatedAt()),
-                utc(order.getPaidAt()), utc(order.getSignedAt()), views);
+        return new OrderDetailVO(
+            order.getId().toString(),
+            order.getOrderNumber(),
+            order.getStatus(),
+            money(order.getPaidAmount()),
+            order.getCurrency(),
+            utc(order.getCreatedAt()),
+            utc(order.getPaidAt()),
+            utc(order.getSignedAt()),
+            views
+        );
     }
 
     public List<ShipmentVO> shipments(String orderId) {
         long userId = currentUser.requireUserId();
         var order = owned(userId, parseId(orderId));
         // 首版数据库唯一约束保证一个订单至多一个包裹，查询轨迹不会随商品数量增加。
-        return shipments.findByOwnedOrder(userId, order.getId()).stream().map(shipment -> {
-            var timeline = events.findByOwnedShipment(userId, shipment.getId()).stream()
-                    .map(event -> new ShipmentVO.ShipmentEvent(utc(event.getOccurredAt()), event.getDescription())).toList();
-            return new ShipmentVO(shipment.getId().toString(), shipment.getCarrier(), shipment.getTrackingNumber(),
-                    ShipmentVO.ShipmentStatus.valueOf(shipment.getStatus()), timeline);
-        }).toList();
+        return shipments
+            .findByOwnedOrder(userId, order.getId())
+            .stream()
+            .map(shipment -> {
+                var timeline = events
+                    .findByOwnedShipment(userId, shipment.getId())
+                    .stream()
+                    .map(event -> new ShipmentVO.ShipmentEvent(utc(event.getOccurredAt()), event.getDescription()))
+                    .toList();
+                return new ShipmentVO(
+                    shipment.getId().toString(),
+                    shipment.getCarrier(),
+                    shipment.getTrackingNumber(),
+                    ShipmentVO.ShipmentStatus.valueOf(shipment.getStatus()),
+                    timeline
+                );
+            })
+            .toList();
     }
 
     private OrderPO owned(long userId, long orderId) {
@@ -92,11 +156,21 @@ public class OrderService {
         if (order == null) throw ApiRequestException.notFound();
         return order;
     }
+
     private long parseId(String id) {
         if (id == null || !id.matches("[1-9][0-9]{0,18}")) throw ApiRequestException.invalid("订单 ID 格式不正确");
-        try { return Long.parseLong(id); }
-        catch (NumberFormatException ex) { throw ApiRequestException.invalid("订单 ID 超出有效范围"); }
+        try {
+            return Long.parseLong(id);
+        } catch (NumberFormatException ex) {
+            throw ApiRequestException.invalid("订单 ID 超出有效范围");
+        }
     }
-    private String money(BigDecimal value) { return value.setScale(2, RoundingMode.UNNECESSARY).toPlainString(); }
-    private OffsetDateTime utc(LocalDateTime value) { return value == null ? null : value.atOffset(ZoneOffset.UTC); }
+
+    private String money(BigDecimal value) {
+        return value.setScale(2, RoundingMode.UNNECESSARY).toPlainString();
+    }
+
+    private OffsetDateTime utc(LocalDateTime value) {
+        return value == null ? null : value.atOffset(ZoneOffset.UTC);
+    }
 }

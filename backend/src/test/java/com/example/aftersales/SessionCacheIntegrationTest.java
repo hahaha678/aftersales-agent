@@ -1,5 +1,8 @@
 package com.example.aftersales;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.awaitility.Awaitility.await;
+
 import com.example.aftersales.identity.cache.CachedSession;
 import com.example.aftersales.identity.cache.SessionCache;
 import java.time.Duration;
@@ -13,24 +16,31 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.awaitility.Awaitility.await;
-
 @EnabledIfEnvironmentVariable(named = "REDIS_TEST_PORT", matches = ".+")
 @ActiveProfiles("test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = {
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.NONE,
+    properties = {
         "app.auth.cache.enabled=true",
         "app.auth.cache.namespace=aftersales-test-${random.uuid}",
         "spring.data.redis.host=127.0.0.1",
         "spring.data.redis.port=${REDIS_TEST_PORT}",
         "spring.data.redis.connect-timeout=500ms",
-        "spring.data.redis.timeout=500ms"
-})
+        "spring.data.redis.timeout=500ms",
+    }
+)
 class SessionCacheIntegrationTest {
-    @Autowired SessionCache cache;
-    @Autowired StringRedisTemplate redis;
 
-    private String hash() { return UUID.randomUUID().toString().replace("-", "").repeat(2); }
+    @Autowired
+    SessionCache cache;
+
+    @Autowired
+    StringRedisTemplate redis;
+
+    private String hash() {
+        return UUID.randomUUID().toString().replace("-", "").repeat(2);
+    }
+
     private CachedSession session(Instant expiry) {
         return new CachedSession(1, 2, "test-user", "测试用户", "CUSTOMER", expiry);
     }
@@ -44,8 +54,9 @@ class SessionCacheIntegrationTest {
         assertThat(shortCache.lookup(hash).state()).isEqualTo(SessionCache.State.MISS);
         assertThat(shortCache.putIfNotRevoked(hash, expected)).isTrue();
         assertThat(shortCache.lookup(hash).session()).isEqualTo(expected);
-        await().atMost(Duration.ofSeconds(3)).untilAsserted(() ->
-                assertThat(shortCache.lookup(hash).state()).isEqualTo(SessionCache.State.MISS));
+        await()
+            .atMost(Duration.ofSeconds(3))
+            .untilAsserted(() -> assertThat(shortCache.lookup(hash).state()).isEqualTo(SessionCache.State.MISS));
     }
 
     @Test
@@ -53,8 +64,9 @@ class SessionCacheIntegrationTest {
         String hash = hash();
         var expiresSoon = session(Instant.now().plusMillis(700));
         assertThat(cache.putIfNotRevoked(hash, expiresSoon)).isTrue();
-        await().atMost(Duration.ofSeconds(3)).untilAsserted(() ->
-                assertThat(cache.lookup(hash).state()).isEqualTo(SessionCache.State.MISS));
+        await()
+            .atMost(Duration.ofSeconds(3))
+            .untilAsserted(() -> assertThat(cache.lookup(hash).state()).isEqualTo(SessionCache.State.MISS));
         assertThat(cache.putIfNotRevoked(hash, session(Instant.now().minusSeconds(1)))).isFalse();
     }
 
@@ -67,8 +79,10 @@ class SessionCacheIntegrationTest {
         assertThat(cache.lookup(hash).state()).isEqualTo(SessionCache.State.REVOKED);
         assertThat(cache.putIfNotRevoked(hash, pendingDatabaseResult)).isFalse();
         cache.revoke(hash, Instant.now().minusSeconds(1));
-        await().pollDelay(Duration.ofMillis(100)).atMost(Duration.ofSeconds(2)).untilAsserted(() ->
-                assertThat(cache.lookup(hash).state()).isEqualTo(SessionCache.State.REVOKED));
+        await()
+            .pollDelay(Duration.ofMillis(100))
+            .atMost(Duration.ofSeconds(2))
+            .untilAsserted(() -> assertThat(cache.lookup(hash).state()).isEqualTo(SessionCache.State.REVOKED));
     }
 
     @Test
@@ -76,6 +90,7 @@ class SessionCacheIntegrationTest {
         assertThatIllegalArgumentException().isThrownBy(() -> cache.lookup("raw-token"));
         assertThatIllegalArgumentException().isThrownBy(() -> cache.putIfNotRevoked(null, session(Instant.now())));
         assertThatIllegalArgumentException().isThrownBy(() ->
-                new SessionCache(redis, "bad{namespace}", Duration.ofSeconds(30)));
+            new SessionCache(redis, "bad{namespace}", Duration.ofSeconds(30))
+        );
     }
 }

@@ -10,6 +10,5 @@ public interface OrderItemMapper {
     List<OrderItemPO> findByOwnedOrder(@Param("userId") long userId, @Param("orderId") long orderId);
 
     /** 为一页订单批量加载商品，避免逐订单查询；空集合返回空列表。 */
-    List<OrderItemPO> findByOwnedOrders(@Param("userId") long userId,
-            @Param("orderIds") List<Long> orderIds);
+    List<OrderItemPO> findByOwnedOrders(@Param("userId") long userId, @Param("orderIds") List<Long> orderIds);
 }

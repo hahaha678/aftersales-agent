@@ -1,0 +1,622 @@
+[
+  {
+    "Sha256": "2c7442d0708649f41db93fa59800ea55b76c0b660f5a5910dedc0bd616b912e0",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\AftersalesApplication.java"
+  },
+  {
+    "Sha256": "084eb6857de2f5da532ae0478d5afe3b115040ca0d9ba30ac300f082740db2d5",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\package-info.java"
+  },
+  {
+    "Sha256": "a5264e60a3248b20e20959c02930d261310a4ef1e615c5a69bcc0bd5906ba6fa",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\controller\\AftersaleController.java"
+  },
+  {
+    "Sha256": "bf74f0515f251f241300ccf7e4bbcc4deed8ecc3f944d26c3cf45bce59854194",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\controller\\package-info.java"
+  },
+  {
+    "Sha256": "dced9b52120399d3c13c8f239429736c0cd5b6407023e957e501c875aadb6925",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\AftersaleReason.java"
+  },
+  {
+    "Sha256": "535a85d7c082a92eba595694d32b6a40e12502d20b4b20418dd2deac79865474",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\AftersaleStatus.java"
+  },
+  {
+    "Sha256": "1a59a6b794f361a20aa1dcbec6314b1bea071ccdd34e438312c15b75b03a4784",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\dto\\ConfirmDraftDTO.java"
+  },
+  {
+    "Sha256": "322c240057582e2523e975d1e60bb77b8690810837d589bc6db9bdecc4d6a119",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\dto\\CreateAftersaleDTO.java"
+  },
+  {
+    "Sha256": "671a2795a5a3a0330905b6bbdc194358b3372edb40adc572a39259af6c5dcb29",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\dto\\DraftDTO.java"
+  },
+  {
+    "Sha256": "e390c54b0d5889ef291d698a9d84412be4215f57ba53a54eea2b9e60ac894448",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\dto\\package-info.java"
+  },
+  {
+    "Sha256": "9dc473a154e64cdc27e02c6a57fa74471c660fb390c6a404c03db27fda3be462",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\dto\\ReviewAftersaleDTO.java"
+  },
+  {
+    "Sha256": "1dc84591ed4176dd1dcfd86e759e207ee905c36adc5f12f03ef51f361b8dcbf8",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\po\\AftersaleDraftPO.java"
+  },
+  {
+    "Sha256": "0594243cfa3a2b94be092894fa2e355a2594f986cbb3318692ca6033af60a769",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\po\\AftersaleEventPO.java"
+  },
+  {
+    "Sha256": "64d0784d89c47960510ea189369f1ffd8aa821dcc0083f90061dd1506769b56c",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\po\\AftersalePO.java"
+  },
+  {
+    "Sha256": "0e2b0a1cd932597c6cc103fd33c09a959830910632bebfd121f60b4d3faa101f",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\po\\package-info.java"
+  },
+  {
+    "Sha256": "61e8cec4f6d8b7a1d0e904d6f9d592bc0598327733e965680902bbbcebd4466d",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\query\\AftersalePageQuery.java"
+  },
+  {
+    "Sha256": "7e3a0be40c173ad9eafac4e87183bec62b4a637cf0b9b623e8f64485a8b26857",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\query\\package-info.java"
+  },
+  {
+    "Sha256": "a9135298d4fe59b5de08553f91f18a8b649d936b6c4f1697de20503dc3c7126f",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\AftersalePageVO.java"
+  },
+  {
+    "Sha256": "88f2305929ba9da34e8f60a125387ee02f2de360b3b0096108aaba3bab6a3a25",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\AftersaleQuoteVO.java"
+  },
+  {
+    "Sha256": "845e4e130a104e0b4addd6e0138a520da175cc632eb44542849542d04548f65b",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\AftersaleVO.java"
+  },
+  {
+    "Sha256": "740dea5eaa38e9e20900d4e2e6f4e220648c44a02ae5b6cb54c25b95c09caa29",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\DraftConfirmationVO.java"
+  },
+  {
+    "Sha256": "7c76571534354be91f2decd40b8fafcd89fa0b8328b02513fd0cfa2ebbcf21e0",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\DraftVO.java"
+  },
+  {
+    "Sha256": "14d42dc495f298978dc5436be2e96d62e5941133174a8f9556254b8302b6986e",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\EligibilityVO.java"
+  },
+  {
+    "Sha256": "09f2a4faddf4379d0ba4f363ae940e170293d17fd08e6caedd97f27f8430e835",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\package-info.java"
+  },
+  {
+    "Sha256": "b0b6654b9c029959878fd1acae05177ffd62a03e1a201f6aef55f84ba1197644",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\mapper\\AftersaleDraftMapper.java"
+  },
+  {
+    "Sha256": "0385ce66903777b37b59f81da199eb4a740853c0b8ee04e0079af32063f2f6b1",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\mapper\\AftersaleMapper.java"
+  },
+  {
+    "Sha256": "494159362389ac4c93c5f2046cee8c803cdc2cfbcfadf8f154b15aaef6a5c50e",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\mapper\\package-info.java"
+  },
+  {
+    "Sha256": "56c386a0f5183358f8d9d976c30ae271638adc91703cea6f2a9cb3011ff8cd95",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\service\\AftersaleDraftService.java"
+  },
+  {
+    "Sha256": "65be51484742d7881bf40b1ebac08d751b6806ab5d987e0c164e3766a8618012",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\service\\AftersaleService.java"
+  },
+  {
+    "Sha256": "88c27a3a46257d6a6cf8b9cd77a425ae45301c111a6bcde823c7cdf47c65b9d9",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\aftersales\\service\\package-info.java"
+  },
+  {
+    "Sha256": "ce4ed40a3116de0d440bcebcd4db5fd218e39701a3aff4622be04b6b81c74fa9",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\package-info.java"
+  },
+  {
+    "Sha256": "fc41f024de782d9ce3b740880a46b7b7cd08aecbc337e9d476c376ae0733043f",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\config\\DeepSeekGateway.java"
+  },
+  {
+    "Sha256": "8c8841bbef8cb0cc13eec319cc7904f81dbd40347821afe904937a2158bc2f4f",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\controller\\package-info.java"
+  },
+  {
+    "Sha256": "7a0cc60aee9398353709b5352aef2913b92252b18bfff873a8696ef1bc59c542",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\domain\\dto\\package-info.java"
+  },
+  {
+    "Sha256": "dc96bcb14153042ea7073673bed6616fa28ccf4dd11042c75f753ba71ed7cec7",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\domain\\po\\package-info.java"
+  },
+  {
+    "Sha256": "24498cc69858e4fca1ee7f3c2d313df3d95c904e6a54d0ad2a986a4fea54b33e",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\domain\\po\\RunPO.java"
+  },
+  {
+    "Sha256": "00163cd7115162862091da79a81aacc4c38fa122a14c930876885efed08aedc5",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\domain\\query\\package-info.java"
+  },
+  {
+    "Sha256": "ae6ee12175d62adae69e6d7eabb88ffd30ec47c9cce7077f70deca41f7afb3f1",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\domain\\vo\\package-info.java"
+  },
+  {
+    "Sha256": "dce27d1ecad1fd1727835c0d8d3780a7e4278cc92976ffe01f98477d1c127c53",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\domain\\vo\\RunVO.java"
+  },
+  {
+    "Sha256": "9008e1f976b16604a901b296a60d1471142f0021f1958c53117b5764b44c7ac3",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\mapper\\package-info.java"
+  },
+  {
+    "Sha256": "4155450f8fd8e21dacccf3d04a1e042af49b8b1dfa5b927c86d32b772a89739a",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\service\\AgentService.java"
+  },
+  {
+    "Sha256": "476c004df628dd7df921571d4e1d5a0422278b4551a08c4c3cc8a12244e499cb",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\service\\AgentTools.java"
+  },
+  {
+    "Sha256": "4ea7ff518562ba49fd7a66d486a594e6dcf580ccf3f9596d806ab06fb3b7ecb5",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\service\\ModelGateway.java"
+  },
+  {
+    "Sha256": "b47d1090c0456d5909385d744b86263b12bf333c0e213cdedc65458a18446f62",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\agent\\service\\package-info.java"
+  },
+  {
+    "Sha256": "c9e9a96421848a354cf4d50f2db83da98e1dd8bf4ae96ce33fd47b7728f40c94",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\common\\package-info.java"
+  },
+  {
+    "Sha256": "e1ed8ddb42e323f9ee874b05ccef41781f3dd3b1a09746038850bc0560a40862",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\common\\config\\OpenApiConfiguration.java"
+  },
+  {
+    "Sha256": "bc6769130f464cc4cdbed49a5c875dcbc3d9d647a2aee340c1a24790a185d70a",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\common\\domain\\vo\\ApiError.java"
+  },
+  {
+    "Sha256": "1870e169bd34ad31dbe12616190c375dee70c8ef337b1b501a68fb041958826c",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\common\\exception\\ApiRequestException.java"
+  },
+  {
+    "Sha256": "18da03d131419bf4645e8d692effb9babf096fecbdcc4d8fa1aab398f37071ea",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\common\\exception\\ContractNotImplementedException.java"
+  },
+  {
+    "Sha256": "7ab626e832c08d92925badee7d7ca4f6abab222a98b6ec9310ac8f2293d36d90",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\common\\filter\\RequestIdFilter.java"
+  },
+  {
+    "Sha256": "cd6c053df5f5088aa13f4d409c53d1bb6d8973df5034277dfe0017b185ae9b09",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\common\\handler\\ApiExceptionHandler.java"
+  },
+  {
+    "Sha256": "6fdc1a027c32f862c604c459b6c91c15f14314a5bb45880dd7f8645dcf3bca71",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\package-info.java"
+  },
+  {
+    "Sha256": "7f640414a22bbaab180c4d31336a63194ef9ad790ce623b6d38ffa1fdcdee51f",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\controller\\ConversationController.java"
+  },
+  {
+    "Sha256": "c44480c692d8b8198e89666dae2dead45049d31bffd62001789f124c63a7cc65",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\controller\\package-info.java"
+  },
+  {
+    "Sha256": "587d77341f0bf5e6181354d294e1e606f15ca6aa7a7d59ed2df11f6708673266",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\domain\\dto\\ConversationDTO.java"
+  },
+  {
+    "Sha256": "dbbd3c43d1b77d594fe299c9cbc5ac0e5b312708cd0cf30e204f42947bd3a416",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\domain\\dto\\package-info.java"
+  },
+  {
+    "Sha256": "f6038e8d823092bd385c5764baf1bf7a47b2cc22bb3539fc35d4f138058ec26a",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\domain\\dto\\SendMessageDTO.java"
+  },
+  {
+    "Sha256": "39ae384dbc13199fa8bb9a4254730f5eb44ff7a8e4cbc79e3ade66472c04328c",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\domain\\po\\ConversationPO.java"
+  },
+  {
+    "Sha256": "f27ff328a110338209a17512748bce22ccc01031c3660583a37c9e5744e3576c",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\domain\\po\\MessagePO.java"
+  },
+  {
+    "Sha256": "7d4ef252a9968c09b87220d2daadae68fe65c152853acf72f69ebdcf2ae04f5d",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\domain\\po\\package-info.java"
+  },
+  {
+    "Sha256": "7336d6dd5e063f11206ddf35eee55759a657a757f8451c6c1abd626ec299857a",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\domain\\query\\package-info.java"
+  },
+  {
+    "Sha256": "af6c397a351b14666e7d3eeca2cf091f86b97ee392320ec1abfa1fd47aceac29",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\domain\\vo\\ConversationVO.java"
+  },
+  {
+    "Sha256": "9b5b941f82d2a40e5bb212e9eaecbcef4bbb6e2f7834758c28d54fd2bdbc3453",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\domain\\vo\\MessageVO.java"
+  },
+  {
+    "Sha256": "e3c9a3e57ac0c024a901290c11ebf72d39592120ddb47724d6106547686ae3db",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\domain\\vo\\package-info.java"
+  },
+  {
+    "Sha256": "f2a4724ffc3d34dff370eb699612b03d0f6876d952fe4d3e06dd96c21393d3c0",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\mapper\\ConversationMapper.java"
+  },
+  {
+    "Sha256": "b02d950d010b3312b958a7d2f5f820b1c4f773b91965f87e276ffba7cf0b3dc2",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\mapper\\package-info.java"
+  },
+  {
+    "Sha256": "4bca4ac86fe148c2fcd5a3b7de32d80cb754ac6c8cb00356fd3f0c5f61ff2f7d",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\service\\ConversationService.java"
+  },
+  {
+    "Sha256": "b0b2de5c45db6c00d678025a390f9632a095b6ae8e6915f99d1313a8e151b6f3",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\conversation\\service\\package-info.java"
+  },
+  {
+    "Sha256": "2c6662cf533ca49ac63fde7227076298212bd45814f647e7a4dad2a6147fc652",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\package-info.java"
+  },
+  {
+    "Sha256": "a938fafcb89d1f0062466f4c05faab2a491168b6bb6d2fd92abcf2781c701218",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\cache\\CachedSession.java"
+  },
+  {
+    "Sha256": "c78b14bce44b86f792b5d83e3ecad97cc2f5a50f05fb884cf1462d0aefd4e4f0",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\cache\\SessionCache.java"
+  },
+  {
+    "Sha256": "00817983b6641d87b5dbc0a152a012f469dadaa28a9e8e73970f00a7caa4c353",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\controller\\package-info.java"
+  },
+  {
+    "Sha256": "3a8dc16634eb45af8dbfeaa4a1b2765bd259fe95ad4a1b0ad9c6fd5bd480f67a",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\controller\\SessionController.java"
+  },
+  {
+    "Sha256": "1686ef0414b2663e8994b1ab217417ba3250a363563024b217a7bab1a47d4626",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\controller\\UserController.java"
+  },
+  {
+    "Sha256": "a0ccaee645a9f647fa4f8df60d86491e7cc52dce3fd00bfc17904ea2dd708ca3",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\domain\\dto\\CreateSessionDTO.java"
+  },
+  {
+    "Sha256": "1c1b535d7f0f9c1dcf5b2981f5a2835922080c0a42212b2aaaf499c523c4f7f3",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\domain\\dto\\package-info.java"
+  },
+  {
+    "Sha256": "154f846e3c26a1545ab8644a6d4feba59f7da748d050f94cc10b91daf3750fb2",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\domain\\po\\package-info.java"
+  },
+  {
+    "Sha256": "16716f6690301a7fc322001c4b6224e3e86634d9199b0b1a6a36a5a93ed11ee8",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\domain\\po\\UserPO.java"
+  },
+  {
+    "Sha256": "90b042e4f3373dc9202dae1be62212bb7d285da5037629ac7e6d5b113960bc5b",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\domain\\po\\UserSessionPO.java"
+  },
+  {
+    "Sha256": "b82d04c38b94b34a137a09e374d0d429af93b64a1ccfdd29ae71f6a715b80938",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\domain\\query\\package-info.java"
+  },
+  {
+    "Sha256": "0f098e1dfd015bde4017da1cf4b05040a2a94dd293592cc003f2ce5190b44a2b",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\domain\\vo\\package-info.java"
+  },
+  {
+    "Sha256": "a8e2d20d6f8a8a99c7519005d27568b8443013c8636a50f7997b56e9aab40f3b",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\domain\\vo\\SessionVO.java"
+  },
+  {
+    "Sha256": "bd027536fc969ec0130e9bf2bf1e32364d8c7b94508a6e53ce1512e871afa9d7",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\domain\\vo\\UserVO.java"
+  },
+  {
+    "Sha256": "e3f1cc264ae1c5ddae81230d6f091dbd65a651011edc4dde19835af93b92c0f0",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\mapper\\package-info.java"
+  },
+  {
+    "Sha256": "a8df160a849ebfd9da1abd30cb387669e5085ca7999d37638e918db32e531b33",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\mapper\\UserMapper.java"
+  },
+  {
+    "Sha256": "0b08f451470812a746e343da4a06beaf060f56aeb83187ab1ce9924add4aadb2",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\mapper\\UserSessionMapper.java"
+  },
+  {
+    "Sha256": "9ad580284974caee35e0fd04803a95043ebc57b8d7079e4a308edc18b1defbd9",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\security\\PasswordConfiguration.java"
+  },
+  {
+    "Sha256": "1d18e34b364a0d46b65d93d078d14398f0c510fd218718b86c6f40fd3bfb3451",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\security\\SecurityConfiguration.java"
+  },
+  {
+    "Sha256": "1c1cee7ef7bd78f2aca2408298a990ae86bcc12006ef9aa4fe3b9986b7d89ece",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\security\\TokenCodec.java"
+  },
+  {
+    "Sha256": "086c4122ff53057d4042f6912c644902ff13d06a576e2af134bdea7fa7e48978",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\service\\AuthFailure.java"
+  },
+  {
+    "Sha256": "470b624a71dfbab2a19f829eb24a6223b3fe3e8283c916fb00ac50f5bc51e086",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\service\\CurrentUserService.java"
+  },
+  {
+    "Sha256": "ade694678d68993bc1706d8ee018becff92cfd0f34a64c3b0b6fab6de0a901a8",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\service\\package-info.java"
+  },
+  {
+    "Sha256": "1d8a5a293ff7233cde473fe8b12450537d88cf77057e9b1498f3bb7204830e39",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\identity\\service\\SessionService.java"
+  },
+  {
+    "Sha256": "91381ff08a5f2052823ed8c55a7f7decaa08335e893e729cafe6a80b9f5d5b30",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\knowledge\\package-info.java"
+  },
+  {
+    "Sha256": "f20c9a593ea9eccb5c6fa44a546b4204222199b0c678b3f5c61cb26724812581",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\knowledge\\controller\\package-info.java"
+  },
+  {
+    "Sha256": "fde1edbd032ad161cd140ad52175209fc5164bd8c3967c2a5718e03ef0712834",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\knowledge\\domain\\dto\\package-info.java"
+  },
+  {
+    "Sha256": "35e812d56d47d3f8b6bcbe30cef254534a549e21e5a595cbf6cedcdf7394bf76",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\knowledge\\domain\\po\\package-info.java"
+  },
+  {
+    "Sha256": "1d113d2ef216586160362bb5f2bada77a8d0c1346977553cd575f28e7c72f345",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\knowledge\\domain\\query\\package-info.java"
+  },
+  {
+    "Sha256": "7b0f83a84aa60c00b944aa0bdcdd160cf2228377a35be7cecc2747949ffc4c14",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\knowledge\\domain\\vo\\package-info.java"
+  },
+  {
+    "Sha256": "53eb08386e02266239ab3c1c1b403c337b82bd347ff3d0b3fff1959300b2d7ec",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\knowledge\\mapper\\package-info.java"
+  },
+  {
+    "Sha256": "e9f03c47ecae206c4b34556927b7e505ff675a077fefbecd9bc6dcd41df0b1f8",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\knowledge\\service\\package-info.java"
+  },
+  {
+    "Sha256": "d02de25f51208a838547134d8de9f6271438a84f668de0eb86de48418a6ce3a3",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\package-info.java"
+  },
+  {
+    "Sha256": "2f396bccdcb597b7b911894353edf9dad846a3b1c46e8b85d5d1e0a29eebaf64",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\controller\\OrderController.java"
+  },
+  {
+    "Sha256": "327b96becb37d5f16c4f1d5b2244b66f908242cf38bf58b119dfd2494abe7112",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\controller\\package-info.java"
+  },
+  {
+    "Sha256": "e6ace605f1b9834f43266d230baadc11838dbfabd385d5252be5f1963f486687",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\OrderStatus.java"
+  },
+  {
+    "Sha256": "00f0813473c3bd8cd790190bd9b3a33a4a299eb1f4c2ea0ec29b39fa5a8cc494",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\dto\\package-info.java"
+  },
+  {
+    "Sha256": "70854a5722ab2e2c9e85ced9ad24272ca4c672669568dc3062808d08a0a52a7a",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\po\\OrderItemPO.java"
+  },
+  {
+    "Sha256": "9c87727fdb600c105589679d79b92387914fe75310f3c480d738ceec54791dc0",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\po\\OrderPO.java"
+  },
+  {
+    "Sha256": "85fa333ea631b586f6894d598583dbcfa22ae8f1dcb63b9dd125b3c11a278b57",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\po\\OrderShipmentPO.java"
+  },
+  {
+    "Sha256": "31e6760e9d7858f692067ae249d10662bfd6987c6992bff2e89e511e3cf788e9",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\po\\package-info.java"
+  },
+  {
+    "Sha256": "af21faaf901b89db79da7773661c06e9246329e5aceeba3f5ac98271e123c7ab",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\po\\ShipmentEventPO.java"
+  },
+  {
+    "Sha256": "a11619546639ad3fd782dfa148832654597b6bdb59c42dc22b8cc46816311d3b",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\query\\OrderPageQuery.java"
+  },
+  {
+    "Sha256": "6bd9009f1cc735a91eaad738bf6514c2a46de3cbea6061bac348e8afa86c1666",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\query\\package-info.java"
+  },
+  {
+    "Sha256": "7eca406aef775207a7945f11ab4a0f982b589b81172e01321d8da49cc03e9cd6",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\vo\\OrderDetailVO.java"
+  },
+  {
+    "Sha256": "c99d2a746ed69dd0ad7cf9d1782432f456b0821f26ab99e300c87bece295c971",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\vo\\OrderItemVO.java"
+  },
+  {
+    "Sha256": "aff2de1e4ccc40bff0f5a176952da4118e7e11747ceb91c04b5d1c7b4e54a4b0",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\vo\\OrderPageVO.java"
+  },
+  {
+    "Sha256": "5e107f53e0a3c69b2d252eb2e1473ce61d36b5bb1bb76912552ed1178e511363",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\vo\\OrderSummaryVO.java"
+  },
+  {
+    "Sha256": "e874cabdfc1bcaf60b6242e41f41e76159b93a8a7ecc5685f78e5573906cc73a",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\vo\\package-info.java"
+  },
+  {
+    "Sha256": "ac75a9aabe7988c4b9c83fbb8f940c07e072a81c92781256a817c52ef05959b0",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\domain\\vo\\ShipmentVO.java"
+  },
+  {
+    "Sha256": "3189184bb923171882ac605115d4e4580dc27de078f70b3119312784615ac6b3",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\mapper\\OrderItemMapper.java"
+  },
+  {
+    "Sha256": "eebb85252c550d9ed175c55adfc014952b476b479717ab8d2549d8e719d613f7",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\mapper\\OrderMapper.java"
+  },
+  {
+    "Sha256": "b7771e97c8c0cfb93a7c75f16e3c6f9c78a4afa410d184f9666b96ebea768329",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\mapper\\OrderShipmentMapper.java"
+  },
+  {
+    "Sha256": "aca2ea6c88030a15436643b82976f923d00c4e1d0df7c3ec34b64a5622323228",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\mapper\\package-info.java"
+  },
+  {
+    "Sha256": "d29f057bc16397205a9188035f404e3a576f0823134916aeca8db787107b6138",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\mapper\\ShipmentEventMapper.java"
+  },
+  {
+    "Sha256": "520c1cb61c244f1d13be5188c01735da1d7cd07c1be40fbffe6e851b8f0604f6",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\service\\OrderService.java"
+  },
+  {
+    "Sha256": "f69ec0e72268a6877703c238a904636e75f49e00e69dd8531df4b170028ecfde",
+    "Path": "backend\\src\\main\\java\\com\\example\\aftersales\\order\\service\\package-info.java"
+  },
+  {
+    "Sha256": "413c3bc1840641dad1b8e67b0e256da2e79bf9cfd08024cb6bd28db96f754c0f",
+    "Path": "backend\\src\\main\\resources\\application-local.yml"
+  },
+  {
+    "Sha256": "580779207a2969e2434e31aebcc0ec97cb7e90457e2dca77d7c2574ab3b6e3b0",
+    "Path": "backend\\src\\main\\resources\\application-scaffold.yml"
+  },
+  {
+    "Sha256": "d008c97b0adf3fc008b99d79b135d2ae78dd5f3170574db9124a98798d0fd6e0",
+    "Path": "backend\\src\\main\\resources\\application.yml"
+  },
+  {
+    "Sha256": "65a223ecdd046e4d9ed355340866da42e9814a2b81057a5a2dea9f41fb4f3010",
+    "Path": "backend\\src\\main\\resources\\db\\migration\\V1__create_project_metadata.sql"
+  },
+  {
+    "Sha256": "9f653019cbfcc4d0ef32c601f35ddaddc5b01e03476dab0f6dc9a8b91268bbf2",
+    "Path": "backend\\src\\main\\resources\\db\\migration\\V2__create_identity_and_order_tables.sql"
+  },
+  {
+    "Sha256": "0f82371eedac1fa9062321286f790a21216b97202c6de5936893762034a868ab",
+    "Path": "backend\\src\\main\\resources\\db\\migration\\V3__create_aftersale_tables.sql"
+  },
+  {
+    "Sha256": "19dde2d78d9df55c15da0b0c46a87162aabe6bfae8b749819336b8cbb242ae6b",
+    "Path": "backend\\src\\main\\resources\\db\\migration\\V4__create_agent_conversation_and_draft.sql"
+  },
+  {
+    "Sha256": "a539c24de2174f4587bdd9060f6d830ffbdd46a0e4b1c02d7b1002b968d17dfa",
+    "Path": "backend\\src\\main\\resources\\mapper\\aftersales\\AftersaleMapper.xml"
+  },
+  {
+    "Sha256": "11f54bcec2a15d4d529ad9ce6d4ee1417450fc57d9d4857c533f6b264210ab83",
+    "Path": "backend\\src\\main\\resources\\mapper\\identity\\UserMapper.xml"
+  },
+  {
+    "Sha256": "3de1bae80881f876789d495d55f226a058bb6468929a5294057ce53729c18634",
+    "Path": "backend\\src\\main\\resources\\mapper\\identity\\UserSessionMapper.xml"
+  },
+  {
+    "Sha256": "a1e7645e7c424344d2ecf8bbf75ff2b10818f6d9bf91d6136ff0f66e3080423d",
+    "Path": "backend\\src\\main\\resources\\mapper\\order\\OrderItemMapper.xml"
+  },
+  {
+    "Sha256": "58e1bd23d4014ef9a9d977a3c69f7d1adb8a65a5fa53a84cfeaa85734c0acdd1",
+    "Path": "backend\\src\\main\\resources\\mapper\\order\\OrderMapper.xml"
+  },
+  {
+    "Sha256": "540c2aedaa1846df3f667a55defc1255fc4c0446fd8b7a33da4941c4839aee79",
+    "Path": "backend\\src\\main\\resources\\mapper\\order\\OrderShipmentMapper.xml"
+  },
+  {
+    "Sha256": "0e6c9323f3aa424735d647db8ac419101d6b6968aba5cacf5ddc15e76c7f8821",
+    "Path": "backend\\src\\main\\resources\\mapper\\order\\ShipmentEventMapper.xml"
+  },
+  {
+    "Sha256": "601ce20b061e25f0b0ccf1099f8b6ef6115ef7ffb0ee9949d89ccdb328679e6b",
+    "Path": "backend\\src\\test\\java\\com\\example\\aftersales\\AftersaleIntegrationTest.java"
+  },
+  {
+    "Sha256": "615bf2a1377a1e546bb908d198458a37daa1c3e51766641fea3a711683b18a3c",
+    "Path": "backend\\src\\test\\java\\com\\example\\aftersales\\AgentIntegrationTest.java"
+  },
+  {
+    "Sha256": "31d0c77da9aa8fe781faf2f3d823a68c64368c19326acfae58bf6ed4c007b627",
+    "Path": "backend\\src\\test\\java\\com\\example\\aftersales\\ApiContractTest.java"
+  },
+  {
+    "Sha256": "feba18d1c8bb60da68ef01b2d7bb1034cf1fb992b159ab8f0ec0e71e05351070",
+    "Path": "backend\\src\\test\\java\\com\\example\\aftersales\\AuthenticationIntegrationTest.java"
+  },
+  {
+    "Sha256": "f7f6937150080b68904a5607e97a3b386ab1dad3fa5d594d9499987774b0dded",
+    "Path": "backend\\src\\test\\java\\com\\example\\aftersales\\DeepSeekProtocolTest.java"
+  },
+  {
+    "Sha256": "b095d2efeb6de4ff75e423ab5c56fcae7a529ff39530ae8cb94fcce9f7c0a0b6",
+    "Path": "backend\\src\\test\\java\\com\\example\\aftersales\\MapperIntegrationTest.java"
+  },
+  {
+    "Sha256": "d0c4c30f00699ebc6a7bb1ca131e354f09e9ef8cf9b4a297e64308f214410bcb",
+    "Path": "backend\\src\\test\\java\\com\\example\\aftersales\\OrderQueryIntegrationTest.java"
+  },
+  {
+    "Sha256": "951f29cf1179e8f6051a958e019d119c0db3849962a4d0536afb3ec8aa05310d",
+    "Path": "backend\\src\\test\\java\\com\\example\\aftersales\\RealAgentBaselineTest.java"
+  },
+  {
+    "Sha256": "0b61449ec27732ea0c8731161689b7c86481a7cf9ecee87266ff738b688460e6",
+    "Path": "backend\\src\\test\\java\\com\\example\\aftersales\\ScaffoldSmokeTest.java"
+  },
+  {
+    "Sha256": "9009569167ad09799832bba13d089b695a00b7d4495da5e96854f14d7750bdf5",
+    "Path": "backend\\src\\test\\java\\com\\example\\aftersales\\SessionCacheIntegrationTest.java"
+  },
+  {
+    "Sha256": "e3ca28454205d51a5cdf25308fbe828c2cc8361b5f1c77a1f87d74dc2777b26c",
+    "Path": "backend\\src\\test\\resources\\application-test.yml"
+  },
+  {
+    "Sha256": "0d8fcc97628820c37ce5c856bb80c81f48c56ecaf1adb783d1cf4a2b5f562a39",
+    "Path": "backend\\src\\test\\resources\\evaluation\\agent-baseline-v1.json"
+  },
+  {
+    "Sha256": "b9190b9f2c6506fd882c7ae8f91313b3521ea24398f3d269f89152de39dd0487",
+    "Path": "pom.xml"
+  },
+  {
+    "Sha256": "060327a55c830965d502d236710f7cfe7a0cd760c5cf5b5359677edc30cf979e",
+    "Path": "backend\\pom.xml"
+  },
+  {
+    "Sha256": "59ab6ca16d7cd5d4c312f7fbdc2bd193aeb3c00394f1f8f44bad9b73da7f2bcb",
+    "Path": "scripts\\Run-AgentBaseline.ps1"
+  }
+]

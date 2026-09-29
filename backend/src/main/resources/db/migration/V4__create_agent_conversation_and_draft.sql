@@ -1,0 +1,83 @@
+CREATE TABLE conversation (
+ id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+ user_id BIGINT NOT NULL,
+ title VARCHAR(100) NOT NULL,
+ created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+ KEY idx_conversation_owner (user_id, created_at DESC, id),
+ FOREIGN KEY (user_id) REFERENCES app_user(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE agent_run (
+ id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+ conversation_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ user_id BIGINT NOT NULL,
+ request_key VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ status VARCHAR(16) NOT NULL,
+ user_content VARCHAR(2000) NOT NULL,
+ assistant_content MEDIUMTEXT NOT NULL,
+ error_message VARCHAR(300) NULL,
+ model VARCHAR(100) NOT NULL,
+ input_tokens INT NOT NULL DEFAULT 0,
+ output_tokens INT NOT NULL DEFAULT 0,
+ created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+ finished_at DATETIME(3) NULL,
+ expires_at DATETIME(3) NOT NULL,
+ UNIQUE KEY uk_agent_message_key(user_id, request_key),
+ KEY idx_run_conversation(conversation_id, created_at, id),
+ KEY idx_run_user_status(user_id, status, expires_at),
+ FOREIGN KEY (conversation_id) REFERENCES conversation(id),
+ FOREIGN KEY (user_id) REFERENCES app_user(id),
+ CHECK (status IN ('RUNNING','SUCCEEDED','FAILED','CANCELLED'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE conversation_message (
+ id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ conversation_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ run_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ role VARCHAR(16) NOT NULL,
+ content MEDIUMTEXT NOT NULL,
+ status VARCHAR(16) NOT NULL,
+ created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+ UNIQUE KEY uk_message_run_role(run_id,role),
+ KEY idx_message_conversation(conversation_id,id),
+ FOREIGN KEY (conversation_id) REFERENCES conversation(id),
+ FOREIGN KEY (run_id) REFERENCES agent_run(id),
+ CHECK (role IN ('USER','ASSISTANT'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE agent_tool_call (
+ id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ run_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ tool_name VARCHAR(80) NOT NULL,
+ status VARCHAR(16) NOT NULL,
+ duration_ms BIGINT NOT NULL,
+ created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+ FOREIGN KEY(run_id) REFERENCES agent_run(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE aftersale_draft (
+ id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+ user_id BIGINT NOT NULL,
+ conversation_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ run_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ order_id BIGINT NOT NULL,
+ order_item_id BIGINT NOT NULL,
+ quantity INT NOT NULL,
+ reason VARCHAR(40) NOT NULL,
+ description VARCHAR(1000) NOT NULL,
+ amount DECIMAL(12,2) NOT NULL,
+ available_quantity INT NOT NULL,
+ product_name VARCHAR(200) NOT NULL,
+ order_number VARCHAR(64) NOT NULL,
+ rule_version VARCHAR(32) NOT NULL,
+ version INT NOT NULL DEFAULT 1,
+ status VARCHAR(16) NOT NULL DEFAULT 'READY',
+ aftersale_id BIGINT NULL,
+ created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+ expires_at DATETIME(3) NOT NULL,
+ KEY idx_draft_conversation(conversation_id,created_at,id),
+ FOREIGN KEY(user_id) REFERENCES app_user(id),
+ FOREIGN KEY(conversation_id) REFERENCES conversation(id),
+ FOREIGN KEY(run_id) REFERENCES agent_run(id),
+ FOREIGN KEY(order_id) REFERENCES trade_order(id),
+ FOREIGN KEY(order_item_id) REFERENCES order_item(id),
+ FOREIGN KEY(aftersale_id) REFERENCES aftersale_request(id),
+ CHECK(quantity>0 AND amount>=0),
+ CHECK(status IN ('READY','CONFIRMED','CANCELLED'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

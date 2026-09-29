@@ -1,0 +1,276 @@
+package com.example.aftersales.agent.service;
+
+import com.example.aftersales.aftersales.domain.dto.DraftDTO;
+import com.example.aftersales.aftersales.domain.query.AftersalePageQuery;
+import com.example.aftersales.aftersales.service.*;
+import com.example.aftersales.common.exception.ApiRequestException;
+import com.example.aftersales.conversation.service.ConversationService;
+import com.example.aftersales.identity.service.SessionService;
+import com.example.aftersales.order.domain.query.OrderPageQuery;
+import com.example.aftersales.order.service.OrderService;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.*;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.*;
+import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
+
+/** 将已有业务服务包装成模型工具；身份和权限由服务端校验，不由模型决定。 */
+@Component
+@ConditionalOnProperty(name = "app.auth.enabled", havingValue = "true")
+public class AgentTools {
+
+    private final OrderService orders;
+    private final AftersaleService sales;
+    private final AftersaleDraftService drafts;
+    private final SessionService sessions;
+    private final ConversationService conversations;
+    private final Validator validator;
+    private static final JsonMapper JSON = JsonMapper.builder().build();
+
+    public AgentTools(
+        OrderService orders,
+        AftersaleService sales,
+        AftersaleDraftService drafts,
+        SessionService sessions,
+        ConversationService conversations,
+        Validator validator
+    ) {
+        this.orders = orders;
+        this.sales = sales;
+        this.drafts = drafts;
+        this.sessions = sessions;
+        this.conversations = conversations;
+        this.validator = validator;
+    }
+
+    // 售后申请使用内部数字 ID；订单工具另用 OrderInput，允许 DEMO-1002 这类完整业务号。
+    public record IdInput(@NotBlank @Pattern(regexp = "[1-9][0-9]{0,18}") String id) {}
+
+    public record OrderInput(@NotBlank @Size(max = 64) String id) {}
+
+    public record PageInput(@Min(1) @Max(10000) int page) {}
+
+    /**
+     * 为每次回答创建独立工具集合。run/token 来自服务端，模型不能指定访问者身份。
+     * active 检查内存任务是否仍在执行，events 将工具进度和草稿卡片发送给前端。
+     */
+    public List<ToolCallback> forRun(
+        String run,
+        String token,
+        BooleanSupplier active,
+        BiConsumer<String, Object> events
+    ) {
+        // 每次任务独立记录调用次数，限制模型反复查询。
+        AtomicInteger calls = new AtomicInteger();
+        return List.of(
+            tool(
+                "listMyOrders",
+                "分页查询我的订单及商品摘要，page 从 1 开始，每页 10 条。需要详情才能核对商品。",
+                PageInput.class,
+                p -> {
+                    var query = new OrderPageQuery();
+                    query.setPage(p.page());
+                    query.setSize(10);
+                    return orders.list(query);
+                },
+                run,
+                token,
+                active,
+                events,
+                calls
+            ),
+            tool(
+                "getMyOrder",
+                "查询本人订单的商品清单、商品项 ID、实付和数量。id 接受内部数字 ID 或完整业务订单号，如 DEMO-1002；不能截取订单号数字猜 ID。",
+                OrderInput.class,
+                p -> orders.detail(orders.resolveOwnedReference(p.id())),
+                run,
+                token,
+                active,
+                events,
+                calls
+            ),
+            tool(
+                "getMyShipments",
+                "查询本人订单物流。id 接受内部数字 ID 或完整业务订单号，如 DEMO-1002。",
+                OrderInput.class,
+                p -> orders.shipments(orders.resolveOwnedReference(p.id())),
+                run,
+                token,
+                active,
+                events,
+                calls
+            ),
+            tool(
+                "getAftersaleEligibility",
+                "查询本人订单所有商品的售后资格、剩余数量及不能申请原因。id 接受内部数字 ID 或完整业务订单号，如 DEMO-1002。",
+                OrderInput.class,
+                p -> sales.eligibility(orders.resolveOwnedReference(p.id())),
+                run,
+                token,
+                active,
+                events,
+                calls
+            ),
+            tool(
+                "listMyAftersales",
+                "分页查询本人售后申请，每页 10 条，page 从 1 开始。",
+                PageInput.class,
+                p -> {
+                    var query = new AftersalePageQuery();
+                    query.setPage(p.page());
+                    query.setSize(10);
+                    return sales.list(query, false);
+                },
+                run,
+                token,
+                active,
+                events,
+                calls
+            ),
+            tool(
+                "getMyAftersale",
+                "查询本人售后申请与时间线，id 为售后申请 ID，不是订单 ID。",
+                IdInput.class,
+                p -> sales.detail(p.id(), false),
+                run,
+                token,
+                active,
+                events,
+                calls
+            ),
+            tool(
+                "createAftersaleDraft",
+                "用户明确申请且信息齐全时生成退货退款草稿，不会提交申请。reason 只能是 QUALITY、DAMAGED、WRONG_ITEM、NO_LONGER_NEEDED、OTHER。",
+                DraftDTO.class,
+                p -> {
+                    var value = drafts.create(run, p);
+                    // 卡片直接来自后端草稿，不从模型自然语言中解析金额或申请参数。
+                    // 这里只生成草稿，正式提交必须走用户确认接口。
+                    events.accept("draft", value);
+                    return value;
+                },
+                run,
+                token,
+                active,
+                events,
+                calls
+            )
+        );
+    }
+
+    /**
+     * 统一包装工具，避免每个工具重复编写参数校验、身份恢复、异常转换和审计。
+     * I 是工具入参类型；function 连接现有业务 Service，框架负责 JSON 与 Java 对象转换。
+     */
+    private <I> ToolCallback tool(
+        String name,
+        String description,
+        Class<I> type,
+        Function<I, Object> function,
+        String run,
+        String token,
+        BooleanSupplier active,
+        BiConsumer<String, Object> events,
+        AtomicInteger calls
+    ) {
+        // description 和 inputType 帮助模型选择工具并生成参数，但不能代替运行时校验。
+        var callback = FunctionToolCallback.<I, Object>builder(name, input -> {
+            if (!validator.validate(input).isEmpty()) throw ApiRequestException.invalid(
+                "工具参数不符合约束，请检查 ID、分页和申请内容"
+            );
+            return function.apply(input);
+        })
+            .description(description)
+            .inputType(type)
+            .build();
+        return new ToolCallback() {
+            public ToolDefinition getToolDefinition() {
+                return callback.getToolDefinition();
+            }
+
+            public String call(String input) {
+                return call(input, new ToolContext(Map.of()));
+            }
+
+            public String call(String input, ToolContext ignored) {
+                // 所有工具共用本轮预算；超过 8 次或任务取消后，不再进入业务服务。
+                if (calls.incrementAndGet() > 8 || !active.getAsBoolean()) throw new IllegalStateException(
+                    "工具调用预算已耗尽或任务已结束"
+                );
+                long start = System.nanoTime();
+                String state = "FAILED";
+                var previous = SecurityContextHolder.getContext();
+                try {
+                    // Token 只保留在本次服务端闭包中，不进入模型参数、数据库或日志；每次工具重新验证。
+                    var principal = sessions.authenticate(token);
+                    // 工具在工作线程执行，不自动继承请求线程的登录上下文，需要显式设置。
+                    var context = SecurityContextHolder.createEmptyContext();
+                    context.setAuthentication(
+                        UsernamePasswordAuthenticationToken.authenticated(
+                            principal,
+                            null,
+                            List.of(new SimpleGrantedAuthority("ROLE_" + principal.role()))
+                        )
+                    );
+                    SecurityContextHolder.setContext(context);
+                    // 再检查数据库中的状态和租约，避免内存仍存活但任务已失效时继续执行。
+                    if (!conversations.running(run)) throw new IllegalStateException("任务已结束");
+                    events.accept("status", Map.of("message", progress(name)));
+                    String result;
+                    try {
+                        result = callback.call(input, new ToolContext(Map.of()));
+                    } catch (org.springframework.ai.tool.execution.ToolExecutionException ex) {
+                        if (ex.getCause() instanceof ApiRequestException request) throw request;
+                        if (
+                            ex.getCause() instanceof com.example.aftersales.identity.service.AuthFailure auth
+                        ) throw auth;
+                        // 不将数据库异常细节或原始参数交给模型，只保留可解释的业务错误。
+                        throw new IllegalStateException("工具暂不可用");
+                    }
+                    // 防止单次工具结果撑大模型上下文；这是字符长度上限，不是 Token 计数。
+                    if (result.length() > 18000) return JSON.writeValueAsString(
+                        Map.of("error", "RESULT_TOO_LARGE", "message", "结果过大，请缩小查询范围")
+                    );
+                    state = "SUCCEEDED";
+                    return result;
+                } catch (ApiRequestException ex) {
+                    // 业务拒绝作为结构化结果交给模型解释；登录失效则向上抛出，结束本轮任务。
+                    return JSON.writeValueAsString(Map.of("error", ex.code(), "message", ex.getMessage()));
+                } catch (com.example.aftersales.identity.service.AuthFailure ex) {
+                    throw ex;
+                } catch (IllegalArgumentException ex) {
+                    return JSON.writeValueAsString(
+                        Map.of("error", "INVALID_ARGUMENT", "message", "工具参数格式错误，请检查字段")
+                    );
+                } finally {
+                    // 线程池会复用线程，无论成功失败都恢复原上下文，避免后续任务混用身份。
+                    SecurityContextHolder.setContext(previous);
+                    // 审计记录执行结果和耗时；默认 FAILED，只有正常返回才标记 SUCCEEDED。
+                    conversations.audit(run, name, state, (System.nanoTime() - start) / 1_000_000);
+                }
+            }
+        };
+    }
+
+    // 进度文案由服务端固定映射，独立于模型的最终正文，不需要模型生成。
+    private static String progress(String name) {
+        return switch (name) {
+            case "listMyOrders", "getMyOrder" -> "正在查询订单…";
+            case "getMyShipments" -> "正在查询物流…";
+            case "getAftersaleEligibility" -> "正在核对售后资格…";
+            case "createAftersaleDraft" -> "正在生成待确认草稿…";
+            default -> "正在查询售后进度…";
+        };
+    }
+}

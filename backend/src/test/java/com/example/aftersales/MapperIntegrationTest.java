@@ -1,5 +1,7 @@
 package com.example.aftersales;
 
+import static org.assertj.core.api.Assertions.*;
+
 import com.example.aftersales.identity.domain.po.UserSessionPO;
 import com.example.aftersales.identity.mapper.UserMapper;
 import com.example.aftersales.identity.mapper.UserSessionMapper;
@@ -18,47 +20,104 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.*;
-
 /** 仅显式提供隔离 MySQL 时运行。Flyway 建表，测试数据每次回滚，不启动 HTTP 服务器。 */
 @EnabledIfEnvironmentVariable(named = "MAPPER_TEST_URL", matches = ".+")
 @ActiveProfiles("local")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = {
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.NONE,
+    properties = {
         "spring.datasource.url=${MAPPER_TEST_URL}",
         "spring.datasource.username=${MAPPER_TEST_USERNAME}",
-        "spring.datasource.password=${MAPPER_TEST_PASSWORD}"
-})
+        "spring.datasource.password=${MAPPER_TEST_PASSWORD}",
+    }
+)
 @Transactional
 class MapperIntegrationTest {
+
     private static final long OWNER = 900001L;
     private static final long OTHER = 900002L;
     private static final LocalDateTime TIME = LocalDateTime.of(2026, 9, 28, 3, 0, 0, 123_000_000);
-    @Autowired JdbcTemplate jdbc;
-    @Autowired UserMapper users;
-    @Autowired UserSessionMapper sessions;
-    @Autowired OrderMapper orders;
-    @Autowired OrderItemMapper items;
-    @Autowired OrderShipmentMapper shipments;
-    @Autowired ShipmentEventMapper events;
+
+    @Autowired
+    JdbcTemplate jdbc;
+
+    @Autowired
+    UserMapper users;
+
+    @Autowired
+    UserSessionMapper sessions;
+
+    @Autowired
+    OrderMapper orders;
+
+    @Autowired
+    OrderItemMapper items;
+
+    @Autowired
+    OrderShipmentMapper shipments;
+
+    @Autowired
+    ShipmentEventMapper events;
 
     @BeforeEach
     void fixtures() {
-        jdbc.update("INSERT INTO app_user(id,username,password_hash,display_name,role,enabled) VALUES(?,?,?,?,?,?)",
-                OWNER, "mapper_customer", "test-only-hash", "测试买家", "CUSTOMER", true);
-        jdbc.update("INSERT INTO app_user(id,username,password_hash,display_name,role,enabled) VALUES(?,?,?,?,?,?)",
-                OTHER, "mapper_disabled", "test-only-hash", "停用用户", "STAFF", false);
+        jdbc.update(
+            "INSERT INTO app_user(id,username,password_hash,display_name,role,enabled) VALUES(?,?,?,?,?,?)",
+            OWNER,
+            "mapper_customer",
+            "test-only-hash",
+            "测试买家",
+            "CUSTOMER",
+            true
+        );
+        jdbc.update(
+            "INSERT INTO app_user(id,username,password_hash,display_name,role,enabled) VALUES(?,?,?,?,?,?)",
+            OTHER,
+            "mapper_disabled",
+            "test-only-hash",
+            "停用用户",
+            "STAFF",
+            false
+        );
         for (long id = 910001; id <= 910004; id++) {
-            jdbc.update("INSERT INTO trade_order(id,user_id,order_number,status,paid_amount,created_at,paid_at) VALUES(?,?,?,?,?,?,?)",
-                    id, id == 910004 ? OTHER : OWNER, "MAPPER-" + id,
-                    id == 910003 ? "SHIPPED" : "PAID", new BigDecimal("19.90"), TIME, TIME);
-            jdbc.update("INSERT INTO order_item(id,order_id,sku_id,product_name,specification,quantity,paid_amount) VALUES(?,?,?,?,?,?,?)",
-                    id + 10000, id, 501L, "测试商品", "黑色", 2, new BigDecimal("19.90"));
+            jdbc.update(
+                "INSERT INTO trade_order(id,user_id,order_number,status,paid_amount,created_at,paid_at) VALUES(?,?,?,?,?,?,?)",
+                id,
+                id == 910004 ? OTHER : OWNER,
+                "MAPPER-" + id,
+                id == 910003 ? "SHIPPED" : "PAID",
+                new BigDecimal("19.90"),
+                TIME,
+                TIME
+            );
+            jdbc.update(
+                "INSERT INTO order_item(id,order_id,sku_id,product_name,specification,quantity,paid_amount) VALUES(?,?,?,?,?,?,?)",
+                id + 10000,
+                id,
+                501L,
+                "测试商品",
+                "黑色",
+                2,
+                new BigDecimal("19.90")
+            );
         }
-        jdbc.update("INSERT INTO order_shipment(id,order_id,carrier,tracking_number,status,shipped_at) VALUES(?,?,?,?,?,?)",
-                930001L, 910003L, "模拟物流", "MAPPER-TRACK", "IN_TRANSIT", TIME.plusHours(1));
-        for (long id : new long[] {940002L, 940001L}) {
-            jdbc.update("INSERT INTO shipment_event(id,shipment_id,occurred_at,description) VALUES(?,?,?,?)",
-                    id, 930001L, TIME.plusHours(2), "模拟轨迹" + id);
+        jdbc.update(
+            "INSERT INTO order_shipment(id,order_id,carrier,tracking_number,status,shipped_at) VALUES(?,?,?,?,?,?)",
+            930001L,
+            910003L,
+            "模拟物流",
+            "MAPPER-TRACK",
+            "IN_TRANSIT",
+            TIME.plusHours(1)
+        );
+        for (long id : new long[] { 940002L, 940001L }) {
+            jdbc.update(
+                "INSERT INTO shipment_event(id,shipment_id,occurred_at,description) VALUES(?,?,?,?)",
+                id,
+                930001L,
+                TIME.plusHours(2),
+                "模拟轨迹" + id
+            );
         }
     }
 
@@ -116,13 +175,16 @@ class MapperIntegrationTest {
     void ownedOrdersFiltersAndStablePagination() {
         assertThat(orders.countByUser(OWNER, null, null)).isEqualTo(3);
         assertThat(orders.findPageByUser(OWNER, null, null, 0, 2))
-                .extracting("id").containsExactly(910003L, 910002L);
+            .extracting("id")
+            .containsExactly(910003L, 910002L);
         assertThat(orders.findPageByUser(OWNER, null, null, 2, 2))
-                .extracting("id").containsExactly(910001L);
+            .extracting("id")
+            .containsExactly(910001L);
         assertThat(orders.findPageByUser(OWNER, null, null, 20, 2)).isEmpty();
         assertThat(orders.countByUser(OWNER, OrderStatus.PAID, null)).isEqualTo(2);
         assertThat(orders.findPageByUser(OWNER, OrderStatus.PAID, "MAPPER-910001", 0, 20))
-                .extracting("id").containsExactly(910001L);
+            .extracting("id")
+            .containsExactly(910001L);
         assertThat(orders.countByUser(OWNER, null, "MAPPER-910004")).isZero();
         assertThat(orders.findPageByUser(OWNER, null, "x' OR 1=1 --", 0, 20)).isEmpty();
         var order = orders.findOwnedById(OWNER, 910001);
@@ -141,7 +203,8 @@ class MapperIntegrationTest {
         assertThat(item.getPaidAmount()).isEqualTo(new BigDecimal("19.90"));
         assertThat(items.findByOwnedOrder(OTHER, 910001)).isEmpty();
         assertThat(items.findByOwnedOrders(OWNER, List.of(910001L, 910004L)))
-                .extracting("orderId").containsExactly(910001L);
+            .extracting("orderId")
+            .containsExactly(910001L);
         assertThat(items.findByOwnedOrders(OWNER, List.of())).isEmpty();
         assertThat(items.findByOwnedOrders(OWNER, null)).isEmpty();
         var shipment = shipments.findByOwnedOrder(OWNER, 910003).getFirst();
@@ -150,10 +213,8 @@ class MapperIntegrationTest {
         assertThat(shipment.getDeliveredAt()).isNull();
         assertThat(shipments.findByOwnedOrder(OWNER, 910001)).isEmpty();
         assertThat(shipments.findByOwnedOrder(OTHER, 910003)).isEmpty();
-        assertThat(events.findByOwnedShipment(OWNER, 930001))
-                .extracting("id").containsExactly(940001L, 940002L);
-        assertThat(events.findByOwnedShipment(OWNER, 930001).getFirst().getOccurredAt())
-                .isEqualTo(TIME.plusHours(2));
+        assertThat(events.findByOwnedShipment(OWNER, 930001)).extracting("id").containsExactly(940001L, 940002L);
+        assertThat(events.findByOwnedShipment(OWNER, 930001).getFirst().getOccurredAt()).isEqualTo(TIME.plusHours(2));
         assertThat(events.findByOwnedShipment(OTHER, 930001)).isEmpty();
     }
 }

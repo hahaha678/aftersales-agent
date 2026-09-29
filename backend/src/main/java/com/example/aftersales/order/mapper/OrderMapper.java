@@ -11,10 +11,19 @@ import org.apache.ibatis.annotations.Param;
 public interface OrderMapper {
     OrderPO findOwnedById(@Param("userId") long userId, @Param("orderId") long orderId);
 
-    List<OrderPO> findPageByUser(@Param("userId") long userId,
-            @Param("status") OrderStatus status, @Param("orderNumber") String orderNumber,
-            @Param("offset") long offset, @Param("limit") int limit);
+    OrderPO findOwnedByNumber(@Param("userId") long userId, @Param("orderNumber") String orderNumber);
 
-    long countByUser(@Param("userId") long userId,
-            @Param("status") OrderStatus status, @Param("orderNumber") String orderNumber);
+    List<OrderPO> findPageByUser(
+        @Param("userId") long userId,
+        @Param("status") OrderStatus status,
+        @Param("orderNumber") String orderNumber,
+        @Param("offset") long offset,
+        @Param("limit") int limit
+    );
+
+    long countByUser(
+        @Param("userId") long userId,
+        @Param("status") OrderStatus status,
+        @Param("orderNumber") String orderNumber
+    );
 }

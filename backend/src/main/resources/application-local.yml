@@ -1,29 +1,29 @@
 spring:
-  data:
-    redis:
-      host: ${REDIS_HOST:127.0.0.1}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      database: ${REDIS_DATABASE:0}
-      connect-timeout: 500ms
-      timeout: 500ms
-  datasource:
-    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:aftersales_agent}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    hikari:
-      maximum-pool-size: 5
-      minimum-idle: 1
-      connection-timeout: 5000
-      connection-init-sql: SET time_zone = '+00:00'
-  flyway:
-    enabled: true
+    data:
+        redis:
+            host: ${REDIS_HOST:127.0.0.1}
+            port: ${REDIS_PORT:6379}
+            password: ${REDIS_PASSWORD:}
+            database: ${REDIS_DATABASE:0}
+            connect-timeout: 500ms
+            timeout: 500ms
+    datasource:
+        url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:aftersales_agent}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+        hikari:
+            maximum-pool-size: 5
+            minimum-idle: 1
+            connection-timeout: 5000
+            connection-init-sql: SET time_zone = '+00:00'
+    flyway:
+        enabled: true
 
 app:
-  auth:
-    enabled: true
-    session-ttl: 2h
-    cache:
-      enabled: true
-      namespace: ${AUTH_CACHE_NAMESPACE:aftersales:auth}
-      ttl: 30s
+    auth:
+        enabled: true
+        session-ttl: 2h
+        cache:
+            enabled: true
+            namespace: ${AUTH_CACHE_NAMESPACE:aftersales:auth}
+            ttl: 30s

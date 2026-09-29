@@ -125,23 +125,25 @@ availableAftersalesQuantity 只表示数量可用值，仍需售后资格接口�
 | 400 | INVALID_REQUEST | JSON、枚举、路径或查询参数不合法 | 已实现 |
 | 401 | AUTHENTICATION_FAILED | 登录凭据错误 | 目标 |
 | 401 | UNAUTHENTICATED | 缺少、过期或失效会话 | 目标 |
-| 403 | FORBIDDEN | 后续客服操作角色不足 | 后续接口 |
+| 403 | FORBIDDEN | 客服操作角色不足 | 已实现 |
 | 404 | RESOURCE_NOT_FOUND | 资源不存在或当前用户不可访问 | local 订单详情与物流查询 |
 | 405 | METHOD_NOT_ALLOWED | 不支持的 HTTP 方法 | 已实现 |
-| 409 | STATE_CONFLICT | 后续申请状态、数量或版本冲突 | 后续接口 |
+| 409 | STATE_CONFLICT | 申请状态、数量、版本或执行冲突 | 已实现 |
+| 429 | RATE_LIMITED | Agent 发送频率超限 | 已实现 |
 | 415 | UNSUPPORTED_MEDIA_TYPE | 请求媒体类型不支持 | 已实现 |
 | 501 | NOT_IMPLEMENTED | 契约占位 | scaffold 所有业务接口 |
 | 503 | AUTH_SERVICE_UNAVAILABLE | 认证依赖不可用，可重试 | local 认证链路 |
+| 503 | AI_NOT_CONFIGURED | 未启用模型或缺少密钥 | Agent 发送接口 |
 
 local 模式中 Controller 与认证过滤器使用相同错误结构，并携带请求 ID。scaffold 模式不进行真实鉴权，供检查接口契约。
 
-## 五、之后的设计批次（尚未创建 Controller）
+## 五、后续模块的实现进度
 
-1. 售后资格与草稿：申请数量、类型、规则版本、有效期。
-2. 售后单与审核/取消记录：从已确认草稿创建申请，幂等键、事务与状态冲突。
-3. 退货物流、退款和换货处理：操作编号、未知结果查询、重复调用。
-4. 会话、消息和 Agent 任务：SSE 事件、等待确认和任务取消。
-5. 政策文档、版本和检索管理。
+1. 售后资格、申请、审核和撤销已实现，见 [AFTERSALES.md](AFTERSALES.md)。
+2. 草稿生成、版本校验、用户确认及并发幂等已实现，见 [AGENT.md](AGENT.md)。
+3. 会话、消息和 Agent 任务已实现，支持带 Bearer 的 SSE、任务查询和取消；接口清单见 AGENT.md。
+4. 退货物流、退款和换货处理待实现。
+5. 政策文档、版本和检索管理待实现。
 
 ## 六、用户检查要点
 
@@ -151,4 +153,4 @@ local 模式中 Controller 与认证过滤器使用相同错误结构，并携�
 - 订单摘要和详情字段是否满足计划中的前端页面。
 - 首版“单商品项售后、单原始包裹、固定排序”的范围是否合适。
 
-以上是供检查的初稿，确认后再设计用户、会话、订单、订单商品与物流表，并按接口逐项实现。
+当前 OpenAPI 覆盖 24 个路径；具体字段和响应以 Controller、DTO/VO 的 Swagger 契约为准。

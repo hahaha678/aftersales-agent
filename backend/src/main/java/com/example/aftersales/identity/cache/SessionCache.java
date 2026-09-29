@@ -19,32 +19,44 @@ import tools.jackson.databind.json.JsonMapper;
 @Component
 @ConditionalOnProperty(name = "app.auth.cache.enabled", havingValue = "true")
 public class SessionCache {
-    private static final DefaultRedisScript<String> READ = new DefaultRedisScript<>("""
-            if redis.call('EXISTS', KEYS[2]) == 1 then return '!revoked' end
-            return redis.call('GET', KEYS[1])
-            """, String.class);
-    private static final DefaultRedisScript<Long> PUT = new DefaultRedisScript<>("""
-            if redis.call('EXISTS', KEYS[2]) == 1 then return 0 end
-            redis.call('SET', KEYS[1], ARGV[1], 'PX', ARGV[2])
-            return 1
-            """, Long.class);
-    private static final DefaultRedisScript<Long> REVOKE = new DefaultRedisScript<>("""
-            local remaining = redis.call('PTTL', KEYS[2])
-            if remaining ~= -1 and remaining < tonumber(ARGV[1]) then
-                redis.call('SET', KEYS[2], '1', 'PX', ARGV[1])
-            end
-            redis.call('DEL', KEYS[1])
-            return 1
-            """, Long.class);
+
+    private static final DefaultRedisScript<String> READ = new DefaultRedisScript<>(
+        """
+        if redis.call('EXISTS', KEYS[2]) == 1 then return '!revoked' end
+        return redis.call('GET', KEYS[1])
+        """,
+        String.class
+    );
+    private static final DefaultRedisScript<Long> PUT = new DefaultRedisScript<>(
+        """
+        if redis.call('EXISTS', KEYS[2]) == 1 then return 0 end
+        redis.call('SET', KEYS[1], ARGV[1], 'PX', ARGV[2])
+        return 1
+        """,
+        Long.class
+    );
+    private static final DefaultRedisScript<Long> REVOKE = new DefaultRedisScript<>(
+        """
+        local remaining = redis.call('PTTL', KEYS[2])
+        if remaining ~= -1 and remaining < tonumber(ARGV[1]) then
+            redis.call('SET', KEYS[2], '1', 'PX', ARGV[1])
+        end
+        redis.call('DEL', KEYS[1])
+        return 1
+        """,
+        Long.class
+    );
 
     private final StringRedisTemplate redis;
     private final JsonMapper json = JsonMapper.builder().build();
     private final String namespace;
     private final Duration ttl;
 
-    public SessionCache(StringRedisTemplate redis,
-            @Value("${app.auth.cache.namespace:aftersales:auth}") String namespace,
-            @Value("${app.auth.cache.ttl:30s}") Duration ttl) {
+    public SessionCache(
+        StringRedisTemplate redis,
+        @Value("${app.auth.cache.namespace:aftersales:auth}") String namespace,
+        @Value("${app.auth.cache.ttl:30s}") Duration ttl
+    ) {
         this.redis = redis;
         if (!namespace.matches("[A-Za-z0-9:_-]+")) {
             throw new IllegalArgumentException("Invalid auth cache namespace");
@@ -71,7 +83,9 @@ public class SessionCache {
         Objects.requireNonNull(session);
         long millis = Math.min(ttl.toMillis(), Duration.between(Instant.now(), session.expiresAt()).toMillis());
         if (millis <= 0) return false;
-        return Long.valueOf(1).equals(redis.execute(PUT, keys, json.writeValueAsString(session), Long.toString(millis)));
+        return Long.valueOf(1).equals(
+            redis.execute(PUT, keys, json.writeValueAsString(session), Long.toString(millis))
+        );
     }
 
     /** expiresAt 必须来自数据库，不能由客户端提供；重复撤销不会缩短已有标记 TTL。 */
@@ -90,6 +104,11 @@ public class SessionCache {
         return List.of(prefix + "session", prefix + "revoked");
     }
 
-    public enum State { HIT, MISS, REVOKED }
+    public enum State {
+        HIT,
+        MISS,
+        REVOKED,
+    }
+
     public record Lookup(State state, CachedSession session) {}
 }

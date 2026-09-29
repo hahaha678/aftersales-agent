@@ -20,8 +20,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(com.example.aftersales.common.exception.ApiRequestException.class)
-    ResponseEntity<Object> businessRequest(com.example.aftersales.common.exception.ApiRequestException ex, WebRequest request) {
-        return ResponseEntity.status(ex.status()).body(error(ex.status(), ex.code(), ex.getMessage(), request, List.of()));
+    ResponseEntity<Object> businessRequest(
+        com.example.aftersales.common.exception.ApiRequestException ex,
+        WebRequest request
+    ) {
+        return ResponseEntity.status(ex.status()).body(
+            error(ex.status(), ex.code(), ex.getMessage(), request, List.of())
+        );
     }
 
     @ExceptionHandler(com.example.aftersales.identity.service.AuthFailure.class)
@@ -33,24 +38,40 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ContractNotImplementedException.class)
     ResponseEntity<Object> notImplemented(ContractNotImplementedException ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
-                .body(error(501, "NOT_IMPLEMENTED", ex.getMessage(), request, List.of()));
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+            error(501, "NOT_IMPLEMENTED", ex.getMessage(), request, List.of())
+        );
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        var fields = ex.getBindingResult().getFieldErrors().stream()
-                .map(item -> new ApiError.FieldViolation(item.getField(), item.getDefaultMessage()))
-                .toList();
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+        MethodArgumentNotValidException ex,
+        HttpHeaders headers,
+        HttpStatusCode status,
+        WebRequest request
+    ) {
+        var fields = ex
+            .getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(item -> new ApiError.FieldViolation(item.getField(), item.getDefaultMessage()))
+            .toList();
         boolean queryBinding = ex.getParameter().hasParameterAnnotation(ModelAttribute.class);
-        return new ResponseEntity<>(error(400, queryBinding ? "INVALID_REQUEST" : "VALIDATION_ERROR",
-                "请求字段不符合约束", request, fields), headers, status);
+        return new ResponseEntity<>(
+            error(400, queryBinding ? "INVALID_REQUEST" : "VALIDATION_ERROR", "请求字段不符合约束", request, fields),
+            headers,
+            status
+        );
     }
 
     @Override
-    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body,
-            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+    protected ResponseEntity<Object> handleExceptionInternal(
+        Exception ex,
+        Object body,
+        HttpHeaders headers,
+        HttpStatusCode status,
+        WebRequest request
+    ) {
         String code = switch (status.value()) {
             case 400 -> "INVALID_REQUEST";
             case 404 -> "RESOURCE_NOT_FOUND";
@@ -58,13 +79,28 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             case 415 -> "UNSUPPORTED_MEDIA_TYPE";
             default -> "HTTP_ERROR";
         };
-        return new ResponseEntity<>(error(status.value(), code, "请求无法处理，请检查路径、参数和请求格式", request, List.of()), headers, status);
+        return new ResponseEntity<>(
+            error(status.value(), code, "请求无法处理，请检查路径、参数和请求格式", request, List.of()),
+            headers,
+            status
+        );
     }
 
-    private ApiError error(int status, String code, String message, WebRequest request,
-                           List<ApiError.FieldViolation> fields) {
+    private ApiError error(
+        int status,
+        String code,
+        String message,
+        WebRequest request,
+        List<ApiError.FieldViolation> fields
+    ) {
         var servletRequest = ((ServletWebRequest) request).getRequest();
-        return new ApiError(status, code, message, servletRequest.getRequestURI(),
-                (String) servletRequest.getAttribute(RequestIdFilter.ATTRIBUTE), fields);
+        return new ApiError(
+            status,
+            code,
+            message,
+            servletRequest.getRequestURI(),
+            (String) servletRequest.getAttribute(RequestIdFilter.ATTRIBUTE),
+            fields
+        );
     }
 }

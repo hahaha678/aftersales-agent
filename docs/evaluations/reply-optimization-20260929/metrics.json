@@ -1,0 +1,41 @@
+[
+  {
+    "file": "docs/evaluations/baseline-v1-20260929/results.json",
+    "model": "deepseek-flash",
+    "suiteSha256": "1e010dbe9337cebbf0d5580774972b15b24ff89eb693ac5b985df884bd5e5d7c",
+    "automaticPasses": 10,
+    "turns": 11,
+    "tools": 18,
+    "totalMedianMs": 2060,
+    "firstTextMedianMs": 497,
+    "inputTokens": 38712.0,
+    "outputTokens": 2367.0,
+    "englishPreambleCases": 5
+  },
+  {
+    "file": "docs/evaluations/reply-optimization-20260929/prompt-only-results.json",
+    "model": "deepseek-flash",
+    "suiteSha256": "1e010dbe9337cebbf0d5580774972b15b24ff89eb693ac5b985df884bd5e5d7c",
+    "automaticPasses": 10,
+    "turns": 11,
+    "tools": 15,
+    "totalMedianMs": 1827,
+    "firstTextMedianMs": 593,
+    "inputTokens": 40342.0,
+    "outputTokens": 1992.0,
+    "englishPreambleCases": 3
+  },
+  {
+    "file": "docs/evaluations/reply-optimization-20260929/results.json",
+    "model": "deepseek-flash",
+    "suiteSha256": "1e010dbe9337cebbf0d5580774972b15b24ff89eb693ac5b985df884bd5e5d7c",
+    "automaticPasses": 10,
+    "turns": 11,
+    "tools": 15,
+    "totalMedianMs": 1480,
+    "firstTextMedianMs": 1467,
+    "inputTokens": 41515.0,
+    "outputTokens": 2001.0,
+    "englishPreambleCases": 0
+  }
+]

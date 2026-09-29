@@ -9,10 +9,15 @@ import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
 @Configuration
 public class PasswordConfiguration {
+
     @Bean
     PasswordEncoder passwordEncoder() {
-        var pbkdf2 = new Pbkdf2PasswordEncoder("", 16, 600000,
-                Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256);
+        var pbkdf2 = new Pbkdf2PasswordEncoder(
+            "",
+            16,
+            600000,
+            Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256
+        );
         return new DelegatingPasswordEncoder("pbkdf2", Map.of("pbkdf2", pbkdf2));
     }
 }
