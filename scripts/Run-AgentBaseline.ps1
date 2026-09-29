@@ -85,7 +85,7 @@ try {
     $env:EVAL_WORKTREE_DIRTY=if(@(& git -C $workspace status --porcelain).Count -gt 0){'true'}else{'false'}
     Push-Location $backend
     try {
-        $testName=if($AftersaleTest){'AftersaleIntegrationTest,AgentIntegrationTest,ApiContractTest,DraftReplyGuardTest,DeepSeekProtocolTest'}elseif($RagEvaluation){'RealRagBaselineTest'}elseif($KnowledgeTest){'PolicyIntegrationTest,PolicyEmbeddingTest,DeepSeekProtocolTest'}else{'RealAgentBaselineTest'}
+        $testName=if($AftersaleTest){'AftersaleIntegrationTest,AgentIntegrationTest,TicketIntegrationTest,ApiContractTest,DraftReplyGuardTest,DeepSeekProtocolTest'}elseif($RagEvaluation){'RealRagBaselineTest'}elseif($KnowledgeTest){'PolicyIntegrationTest,PolicyEmbeddingTest,DeepSeekProtocolTest'}else{'RealAgentBaselineTest'}
         Write-Output "Running $testName. KnowledgeTest and AftersaleTest never call DeepSeek."
         & mvn -o "-Dmaven.repo.local=$(Join-Path $workspace '.m2-local')" "-Dtest=$testName" test *> (Join-Path $runtime 'maven.log')
         if ($LASTEXITCODE -ne 0) { throw "Evaluation runner failed. See $runtime/maven.log" }

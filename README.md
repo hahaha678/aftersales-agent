@@ -1,5 +1,7 @@
 # 电商智能售后 Agent
 
+新增异步人工工单：聊天页提交并分享当时的对话快照，客服领取、回复并解决，买家查询进度。重启 local 后端自动应用 V8，详见 [工单联调说明](docs/SUPPORT_TICKETS.md)。
+
 最新进展：已补齐客服收货后的模拟退款闭环，支持成功、失败、超时回查、幂等重试和退款流水展示，见 [模拟退款联调说明](docs/SIMULATED_REFUND.md)。local 重启会自动应用 V7；当前不接入真实支付。
 
 个人学习与简历项目。已包含 Vue 3 + TypeScript 页面、MyBatis 数据访问、MySQL + Redis 会话认证、订单物流、售后申请及审核、DeepSeek Agent 与草稿确认。新增政策知识库：客服录入发布、本地 Embedding、原文检索与回答来源追溯。Ollama 安装及使用见 [RAG 启动说明](docs/KNOWLEDGE_RAG.md)；已完成 15 个场景的真实模型评测，结果见 [RAG 基线报告](docs/evaluations/rag-baseline-v1-20260929/REPORT.md)。退回物流登记与客服收货确认已实现，见 [联调说明](docs/RETURN_SHIPMENT.md)；实际退款仍待实现。
@@ -60,7 +62,7 @@ DB_PASSWORD=你的本地密码
 
 默认连接 127.0.0.1:3306/aftersales_agent，可通过 DB_HOST、DB_PORT、DB_NAME 修改。
 `.env.example` 是配置说明，Spring Boot 不会自动读取 `.env`；请通过 IDEA 或终端设置变量。
-local 启动会执行尚未应用的 V1–V7 迁移，创建业务、会话、草稿、政策与向量来源表，并扩展退回物流、收货确认字段和模拟退款流水。
+local 启动会执行尚未应用的 V1–V8 迁移，创建业务、会话、草稿、政策与向量来源表，并扩展退回物流、收货确认字段、模拟退款流水和人工工单。
 数据库不可用或迁移失败时启动应失败；不会自动切换到无数据库模式。
 不要同时启用 scaffold 和 local。已在隔离的 MySQL 8.0.43 实例验证迁移，尚未读取或使用你日常数据库的密码，也未迁移 3306 上的数据库。
 数据库使用 UTC 存储时间，API 返回带偏移的 ISO-8601 时间。
@@ -100,7 +102,7 @@ ScaffoldSmokeTest 使用随机端口启动真实 HTTP 服务，验证无数据�
 - 设计说明与接口清单：[docs/API_DESIGN.md](docs/API_DESIGN.md)。
 - Swagger UI：http://127.0.0.1:8080/swagger-ui.html 。
 - OpenAPI JSON：http://127.0.0.1:8080/v3/api-docs 。
-- 身份、订单、售后、客服审核、Agent 会话、草稿、知识库和模拟退款接口已实现，OpenAPI 当前包含 36 个路径。
+- 身份、订单、售后、客服审核、Agent 会话、草稿、知识库、模拟退款和人工工单接口已实现，OpenAPI 当前包含 44 个路径。
 - 契约以 Controller、DTO 和 Swagger v3 注解为准；scaffold 合法业务请求返回 501，local 启用业务实现。
 - local 登录会写入真实会话；请使用专用开发库和按文档手工导入的演示账号。
 - 构建验证：Maven verify 通过，接口契约测试覆盖健康、文档结构、占位响应和输入校验。

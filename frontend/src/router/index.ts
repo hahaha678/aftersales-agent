@@ -7,6 +7,31 @@ const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
+            path: '/tickets/new',
+            component: () => import('../views/TicketCreateView.vue'),
+            meta: { title: '转人工处理', requiresAuth: true },
+        },
+        {
+            path: '/tickets',
+            component: () => import('../views/TicketsView.vue'),
+            meta: { title: '人工工单', requiresAuth: true },
+        },
+        {
+            path: '/tickets/:id',
+            component: () => import('../views/TicketsView.vue'),
+            meta: { title: '工单详情', requiresAuth: true },
+        },
+        {
+            path: '/staff/tickets',
+            component: () => import('../views/TicketsView.vue'),
+            meta: { title: '客服工单', requiresAuth: true, staff: true },
+        },
+        {
+            path: '/staff/tickets/:id',
+            component: () => import('../views/TicketsView.vue'),
+            meta: { title: '客服工单详情', requiresAuth: true, staff: true },
+        },
+        {
             path: '/knowledge',
             component: () => import('../views/KnowledgeView.vue'),
             meta: { title: '政策知识库', requiresAuth: true },

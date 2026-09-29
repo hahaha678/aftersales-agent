@@ -19,6 +19,7 @@ const navigation = [
     { to: '/assistant', label: '智能售后', symbol: '✦' },
     { to: '/knowledge', label: '政策知识库', symbol: '▧' },
     { to: '/aftersales', label: '售后记录', symbol: '↺' },
+    { to: '/tickets', label: '人工工单', symbol: '☏' },
 ]
 async function signOut() {
     if (busy.value) return
@@ -57,6 +58,13 @@ async function signOut() {
                     class="nav-item"
                     active-class="active"
                     >✓ 客服审核</RouterLink
+                >
+                <RouterLink
+                    v-if="session.user?.role === 'STAFF'"
+                    to="/staff/tickets"
+                    class="nav-item"
+                    active-class="active"
+                    >☏ 客服工单</RouterLink
                 >
             </nav>
             <div class="sidebar-note">

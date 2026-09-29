@@ -295,6 +295,12 @@ void refresh()
                     <span class="muted">{{ enabled ? '订单信息仅对本人可见' : availability }}</span>
                 </div>
                 <button class="button secondary" :disabled="sending || loading" @click="refresh">刷新会话</button>
+                <RouterLink
+                    v-if="selected && !loading"
+                    class="button secondary"
+                    :to="{ path: '/tickets/new', query: { conversation: selected } }"
+                    >转人工</RouterLink
+                >
             </div>
             <div ref="transcript" class="chat-transcript" aria-label="对话消息" :aria-busy="loading">
                 <button v-if="older" class="button secondary" :disabled="loading" @click="more">加载更早的消息</button>
@@ -442,6 +448,7 @@ void refresh()
 }
 .chat-heading {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: 12px;
     padding: 24px;
