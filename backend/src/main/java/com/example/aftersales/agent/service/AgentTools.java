@@ -97,6 +97,17 @@ public class AgentTools {
                 calls
             ),
             tool(
+                "listEligibleAftersaleItems",
+                "用户查询哪些订单可以售后/退款时优先使用本工具，无需先列订单再逐笔查资格。按可申请商品项分页，每页10项，page从1开始；已过滤超期、未签收、零实付和数量耗尽商品。返回订单号、商品项ID、剩余数量及剩余总金额。hasMore为true时仅说明还有下一页，不要自动遍历所有页；用户要求继续时使用nextPage。不同商品可能属于同一订单。提交时仍重新校验。",
+                PageInput.class,
+                p -> sales.eligibleItems(p.page()),
+                run,
+                token,
+                active,
+                events,
+                calls
+            ),
+            tool(
                 "listMyOrders",
                 "分页查询我的订单及商品摘要，page 从 1 开始，每页 10 条。需要详情才能核对商品。",
                 PageInput.class,
@@ -238,7 +249,7 @@ public class AgentTools {
                 try {
                     if (callIndex > 8 || !active.getAsBoolean()) {
                         errorCode = callIndex > 8 ? "TOOL_BUDGET_EXCEEDED" : "RUN_NOT_ACTIVE";
-                        throw new IllegalStateException("工具调用预算已耗尽或任务已结束");
+                        throw new AgentExecutionException(errorCode);
                     }
                     // Token 只保留在本次服务端闭包中，不进入模型参数、数据库或日志；每次工具重新验证。
                     var principal = sessions.authenticate(token);
@@ -255,7 +266,7 @@ public class AgentTools {
                     // 再检查数据库中的状态和租约，避免内存仍存活但任务已失效时继续执行。
                     if (!conversations.running(run)) {
                         errorCode = "RUN_NOT_ACTIVE";
-                        throw new IllegalStateException("任务已结束");
+                        throw new AgentExecutionException("RUN_NOT_ACTIVE");
                     }
                     events.accept("status", Map.of("message", progress(name)));
                     String result;
@@ -318,7 +329,7 @@ public class AgentTools {
             case "searchPolicies" -> "正在检索售后政策…";
             case "listMyOrders", "getMyOrder" -> "正在查询订单…";
             case "getMyShipments" -> "正在查询物流…";
-            case "getAftersaleEligibility" -> "正在核对售后资格…";
+            case "getAftersaleEligibility", "listEligibleAftersaleItems" -> "正在核对售后资格…";
             case "createAftersaleDraft" -> "正在生成待确认草稿…";
             default -> "正在查询售后进度…";
         };

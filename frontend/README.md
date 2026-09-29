@@ -16,7 +16,7 @@ npm run dev
 
 后端默认 8080。如果改端口，复制 .env.example 为 .env.local，修改 BACKEND_URL 后重启 Vite。Vue 文件修改会热更新。
 
-登录需要数据库已有用户。仅在开发库中，按 [数据库说明](../docs/DATABASE_DESIGN.md) 手动运行完整的 [演示数据脚本](../deploy/mysql/02-seed-demo-data.sql)，公开演示账号 demo_customer，密码 DemoPass123!。脚本已包含选择 aftersales_agent 库和导入开关，无需拼接 SQL；首次导入要求业务表为空，已导入则跳过，不覆盖已有数据。401 可能表示账号不存在、密码不符或账号停用；503 应检查后端及数据库、Redis连接；501 表示功能尚未启用（例如 scaffold 配置）。
+登录需要数据库已有用户。仅在开发库中，按 [数据库说明](../docs/DATABASE_DESIGN.md) 手动运行完整的 [演示数据脚本](../deploy/mysql/02-seed-demo-data.sql)，公开演示账号 demo_customer，密码 123。脚本已包含选择 aftersales_agent 库和导入开关，无需拼接 SQL；首次导入要求业务表为空，已导入则跳过，不覆盖已有数据。401 可能表示账号不存在、密码不符或账号停用；503 应检查后端及数据库、Redis连接；501 表示功能尚未启用（例如 scaffold 配置）。
 
 ## 页面与接口
 
@@ -30,7 +30,7 @@ npm run dev
 | /orders/:id/aftersales/new | 售后资格、商品数量、原因描述、确认提交 | 资格查询与 POST /api/aftersales |
 | /aftersales、/aftersales/:id | 本人记录、详情、撤销 | /api/aftersales 系列 |
 | /staff/aftersales、/staff/aftersales/:id | 客服跨用户查询和审核 | /api/staff/aftersales 系列 |
-| /assistant | 智能售后暂未开放 | 尚未接入 |
+| /assistant | 智能售后、SSE、草稿确认、转人工 | Agent / conversation / drafts 系列 |
 
 列表筛选和页码保存在 URL，详情返回列表时保留。ID、金额采用字符串，避免大整数和小数精度损失。日期按浏览器本地时区展示。商品金额显示整行实付，availableAftersalesQuantity 已扣除售后占用，仍需通过资格接口校验状态和期限。
 
@@ -82,3 +82,5 @@ dist/ 为构建结果。preview 仅供预览，不是生产服务，也未配置
 售后模块已接入真实 REST API；重启后端完成 V3 迁移后即可联调。详细验收流程见 [AFTERSALES.md](../docs/AFTERSALES.md)。
 
 Agent 需要 V4 迁移和后端 DeepSeek 配置，参见 [AGENT.md](../docs/AGENT.md)。不在浏览器保存模型密钥；未配置模型时禁用发送，原有订单和售后页面可继续使用。聊天历史持久化在 MySQL，退出登录清除页面内容和当前浏览器流连接。
+
+完整页面范围、图片凭证、人工工单、知识库及执行监控演示见 [交付手册](../docs/DELIVERY_GUIDE.md)。

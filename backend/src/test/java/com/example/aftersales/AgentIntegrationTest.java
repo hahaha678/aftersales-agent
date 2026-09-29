@@ -94,6 +94,7 @@ class AgentIntegrationTest {
             Consumer<ModelGateway.Chunk> sink = invocation.getArgument(3);
             assertThat(tools.stream().map(t -> t.getToolDefinition().name())).containsExactly(
                 "searchPolicies",
+                "listEligibleAftersaleItems",
                 "listMyOrders",
                 "getMyOrder",
                 "getMyShipments",
@@ -107,6 +108,11 @@ class AgentIntegrationTest {
                 release.await(15, TimeUnit.SECONDS);
             }
             if (message.equals("revoked")) tool(tools, "getMyOrder").call("{\"id\":\"" + order + "\"}");
+            if (message.equals("eligible")) {
+                var result = json.readTree(tool(tools, "listEligibleAftersaleItems").call("{\"page\":1}"));
+                assertThat(result.path("items").isArray()).isTrue();
+                assertThat(result.has("hasMore")).isTrue();
+            }
             if (message.equals("fail")) throw new IllegalStateException("provider-secret-must-not-leak");
             if (message.equals("draft") || message.equals("draft-second")) {
                 long targetItem = message.equals("draft-second")
@@ -366,7 +372,9 @@ class AgentIntegrationTest {
     void toolsPreserveOwnershipValidationAndBudget() throws Exception {
         assertThat(await(send("foreign")).path("status").asString()).isEqualTo("SUCCEEDED");
         assertThat(await(send("invalid")).path("status").asString()).isEqualTo("SUCCEEDED");
-        assertThat(await(send("budget")).path("status").asString()).isEqualTo("FAILED");
+        var exhausted = await(send("budget"));
+        assertThat(exhausted.path("status").asString()).isEqualTo("FAILED");
+        assertThat(exhausted.path("errorMessage").asString()).contains("8 次上限");
         assertThat(
             jdbc.queryForObject(
                 "SELECT COUNT(*) FROM agent_tool_call t JOIN agent_run r ON r.id=t.run_id WHERE r.user_id=?",
@@ -374,6 +382,19 @@ class AgentIntegrationTest {
                 users.get(0)
             )
         ).isEqualTo(11);
+    }
+
+    @Test
+    void eligibleItemSearchUsesOneAuditedToolCall() throws Exception {
+        var run = await(send("eligible"));
+        assertThat(run.path("status").asString()).isEqualTo("SUCCEEDED");
+        assertThat(
+            jdbc.queryForObject(
+                "SELECT COUNT(*) FROM agent_tool_call WHERE run_id=?",
+                Integer.class,
+                run.path("id").asString()
+            )
+        ).isEqualTo(1);
     }
 
     @Test

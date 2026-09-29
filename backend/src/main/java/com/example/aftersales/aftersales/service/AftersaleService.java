@@ -44,6 +44,14 @@ public class AftersaleService {
         this.refunds = refunds;
     }
 
+    public EligibleItemsVO eligibleItems(int page) {
+        long uid = user.requireUserId();
+        if (page < 1 || page > 10000) throw ApiRequestException.invalid("页码应在 1 至 10000 之间");
+        var rows = requests.eligibleItems(uid, LocalDateTime.now(ZoneOffset.UTC), (page - 1L) * 10);
+        boolean more = rows.size() > 10;
+        return new EligibleItemsVO(rows.stream().limit(10).toList(), page, 10, more, more ? page + 1 : null);
+    }
+
     public EligibilityVO eligibility(String orderId) {
         long uid = user.requireUserId();
         var order = owned(uid, id(orderId));

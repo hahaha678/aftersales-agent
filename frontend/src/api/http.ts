@@ -10,7 +10,14 @@ export class ApiError extends Error {
 }
 export async function request<T>(
     path: string,
-    options: { method?: string; body?: unknown; auth?: boolean; signal?: AbortSignal; timeoutMs?: number } = {},
+    options: {
+        method?: string
+        body?: unknown
+        auth?: boolean
+        signal?: AbortSignal
+        timeoutMs?: number
+        responseType?: 'blob'
+    } = {},
 ): Promise<T> {
     const controller = new AbortController()
     const abort = () => controller.abort()
@@ -24,11 +31,18 @@ export async function request<T>(
             credentials: 'omit',
             cache: 'no-store',
             headers: {
-                Accept: 'application/json',
+                Accept: options.responseType === 'blob' ? 'image/jpeg,image/png' : 'application/json',
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+                ...(options.body !== undefined && !(options.body instanceof FormData)
+                    ? { 'Content-Type': 'application/json' }
+                    : {}),
             },
-            body: options.body === undefined ? undefined : JSON.stringify(options.body),
+            body:
+                options.body instanceof FormData
+                    ? options.body
+                    : options.body === undefined
+                      ? undefined
+                      : JSON.stringify(options.body),
             signal: controller.signal,
         })
         if (!response.ok) {
@@ -50,6 +64,7 @@ export async function request<T>(
             )
         }
         if (response.status === 204) return undefined as T
+        if (options.responseType === 'blob') return (await response.blob()) as T
         if (!response.headers.get('content-type')?.includes('json')) throw new Error('服务返回了意外内容，请检查连接。')
         return (await response.json()) as T
     } catch (error) {

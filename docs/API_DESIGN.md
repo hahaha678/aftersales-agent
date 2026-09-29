@@ -1,6 +1,6 @@
 # RESTful API 契约 · 用户、订单与售后
 
-售后第一版已实现，新增 8 个接口与规则见 [AFTERSALES.md](AFTERSALES.md)。下文第一批契约保留为用户和订单接口说明；后续规划中的售后资格、申请及审核现已落地，Agent 草稿尚未实现。
+售后第一版已实现，新增 8 个接口与规则见 [AFTERSALES.md](AFTERSALES.md)。下文第一批契约保留为用户和订单接口说明；后续规划中的售后资格、申请及审核现已落地，Agent 草稿、用户确认、RAG、退回收货、模拟退款、工单、图片和执行监控均已实现，最新概览见 DELIVERY_GUIDE.md。
 
 状态：待用户检查。Controller/DTO/OpenAPI 注解是字段契约来源；本文记录统一规则与业务语义。
 代码现按 controller、service、mapper、domain 分层；domain 内区分 dto、po、query、vo。响应对象使用 VO 后缀，订单列表条件封装为 OrderPageQuery；接口 URL 和 JSON 字段不变。详见 CODE_STRUCTURE.md。
@@ -142,8 +142,8 @@ local 模式中 Controller 与认证过滤器使用相同错误结构，并携�
 1. 售后资格、申请、审核和撤销已实现，见 [AFTERSALES.md](AFTERSALES.md)。
 2. 草稿生成、版本校验、用户确认及并发幂等已实现，见 [AGENT.md](AGENT.md)。
 3. 会话、消息和 Agent 任务已实现，支持带 Bearer 的 SSE、任务查询和取消；接口清单见 AGENT.md。
-4. 退货物流、退款和换货处理待实现。
-5. 政策文档、版本和检索管理待实现。
+4. 退回物流、客服收货与模拟退款已实现；真实支付和换货未实现。
+5. 政策文档、发布与检索管理已实现，见 KNOWLEDGE_RAG.md。
 
 ## 六、用户检查要点
 
@@ -153,4 +153,4 @@ local 模式中 Controller 与认证过滤器使用相同错误结构，并携�
 - 订单摘要和详情字段是否满足计划中的前端页面。
 - 首版“单商品项售后、单原始包裹、固定排序”的范围是否合适。
 
-当前 OpenAPI 覆盖 24 个路径；具体字段和响应以 Controller、DTO/VO 的 Swagger 契约为准。
+当前 OpenAPI 覆盖 52 个路径；具体字段和响应以 Controller、DTO/VO 的 Swagger 契约为准。

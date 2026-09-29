@@ -40,7 +40,18 @@ class ApiContractTest {
         assertThat(response.statusCode()).isEqualTo(200);
         JsonNode document = mapper.readTree(response.body());
         var paths = document.path("paths");
-        assertThat(paths.size()).isEqualTo(47);
+        assertThat(paths.size()).isEqualTo(52);
+        assertThat(
+            paths
+                .path("/api/aftersales/{id}/evidence")
+                .path("post")
+                .path("requestBody")
+                .path("content")
+                .has("multipart/form-data")
+        ).isTrue();
+        assertThat(
+            paths.path("/api/staff/aftersales/{id}/evidence/{imageId}/content").path("get").path("security").isArray()
+        ).isTrue();
         assertThat(paths.path("/api/staff/agent-runs").path("get").path("security").isArray()).isTrue();
         assertThat(paths.path("/api/staff/agent-runs/{id}/tool-calls").has("get")).isTrue();
         assertThat(paths.path("/api/tickets").has("post")).isTrue();

@@ -76,11 +76,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             case 400 -> "INVALID_REQUEST";
             case 404 -> "RESOURCE_NOT_FOUND";
             case 405 -> "METHOD_NOT_ALLOWED";
+            case 413 -> "PAYLOAD_TOO_LARGE";
             case 415 -> "UNSUPPORTED_MEDIA_TYPE";
             default -> "HTTP_ERROR";
         };
         return new ResponseEntity<>(
-            error(status.value(), code, "请求无法处理，请检查路径、参数和请求格式", request, List.of()),
+            error(
+                status.value(),
+                code,
+                status.value() == 413
+                    ? "上传内容超过大小限制，请压缩文件后重试"
+                    : "请求无法处理，请检查路径、参数和请求格式",
+                request,
+                List.of()
+            ),
             headers,
             status
         );

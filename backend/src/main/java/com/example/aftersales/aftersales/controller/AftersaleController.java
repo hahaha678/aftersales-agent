@@ -63,6 +63,15 @@ public class AftersaleController {
         return value;
     }
 
+    @GetMapping("/aftersale-eligible-items")
+    @Operation(
+        summary = "分页查询本人可售后商品项",
+        description = "每页10项，包含订单号、剩余数量和剩余总金额；hasMore表示还有下一页，提交时重新校验。"
+    )
+    public EligibleItemsVO eligibleItems(@RequestParam(defaultValue = "1") int page) {
+        return service().eligibleItems(page);
+    }
+
     @GetMapping("/orders/{orderId}/aftersale-eligibility")
     @Operation(
         summary = "查询订单售后资格",

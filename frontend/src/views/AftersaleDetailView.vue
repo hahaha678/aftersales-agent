@@ -17,6 +17,7 @@ import {
 } from '../api/aftersales'
 import { dateTime, money } from '../utils/format'
 import ErrorNotice from '../components/ErrorNotice.vue'
+import EvidencePanel from '../components/EvidencePanel.vue'
 const route = useRoute(),
     data = ref<Aftersale | null>(null),
     error = ref<unknown>(null),
@@ -202,6 +203,7 @@ onBeforeUnmount(() => {
             </dl>
             <RouterLink v-if="!staff" class="back-link" :to="`/orders/${data.orderId}`">查看原订单 →</RouterLink>
         </section>
+        <EvidencePanel :key="`${staff}:${data.id}`" :request-id="data.id" :status="data.status" :staff="staff" />
         <section v-if="data.status === 'PENDING'" class="surface">
             <form v-if="staff" class="aftersale-form" @submit.prevent="act">
                 <h2>客服审核</h2>

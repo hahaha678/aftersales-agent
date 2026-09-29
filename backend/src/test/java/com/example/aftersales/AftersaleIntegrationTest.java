@@ -96,6 +96,10 @@ class AftersaleIntegrationTest {
     void cleanup() {
         for (long uid : users) {
             jdbc.update(
+                "DELETE e FROM aftersale_evidence e JOIN aftersale_request a ON a.id=e.request_id WHERE a.user_id=?",
+                uid
+            );
+            jdbc.update(
                 "DELETE r FROM aftersale_refund r JOIN aftersale_request a ON a.id=r.request_id WHERE a.user_id=?",
                 uid
             );
@@ -708,6 +712,149 @@ class AftersaleIntegrationTest {
                 .path("total")
                 .asLong()
         ).isEqualTo(1);
+    }
+
+    @Test
+    void eligibleItemsFiltersOwnershipExpiryAndOccupiedQuantities() throws Exception {
+        String request = create(1);
+        var result = expect(call("GET", "/aftersale-eligible-items", null, 0), 200);
+        assertThat(result.path("items").size()).isEqualTo(1);
+        var first = result.path("items").get(0);
+        assertThat(first.path("orderId").asString()).isEqualTo(String.valueOf(order));
+        assertThat(first.path("availableQuantity").asInt()).isEqualTo(2);
+        var single = expect(call("GET", "/orders/" + order + "/aftersale-eligibility", null, 0), 200)
+            .path("items")
+            .get(0);
+        assertThat(first.path("remainingAmount").asString()).isEqualTo(single.path("remainingAmount").asString());
+        create(2);
+        assertThat(
+            expect(call("GET", "/aftersale-eligible-items", null, 0), 200)
+                .path("items")
+                .size()
+        ).isZero();
+        expect(call("POST", "/aftersales/" + request + "/cancellation", null, 0), 200);
+        assertThat(
+            expect(call("GET", "/aftersale-eligible-items", null, 0), 200)
+                .path("items")
+                .get(0)
+                .path("availableQuantity")
+                .asInt()
+        ).isEqualTo(1);
+        expect(call("GET", "/aftersale-eligible-items?page=0", null, 0), 400);
+        expect(call("GET", "/aftersale-eligible-items", null, -1), 401);
+    }
+
+    @Test
+    void eligibleItemsPaginatesWithoutTruncatingOrRepeatingRows() throws Exception {
+        for (int i = 0; i < 12; i++) makeOrder(users.get(0), 1);
+        var first = expect(call("GET", "/aftersale-eligible-items?page=1", null, 0), 200);
+        var second = expect(call("GET", "/aftersale-eligible-items?page=2", null, 0), 200);
+        assertThat(first.path("items").size()).isEqualTo(10);
+        assertThat(first.path("hasMore").asBoolean()).isTrue();
+        assertThat(first.path("nextPage").asInt()).isEqualTo(2);
+        assertThat(second.path("items").size()).isEqualTo(3);
+        assertThat(second.path("hasMore").asBoolean()).isFalse();
+        var ids = new HashSet<String>();
+        first.path("items").forEach(row -> assertThat(ids.add(row.path("orderItemId").asString())).isTrue());
+        second.path("items").forEach(row -> assertThat(ids.add(row.path("orderItemId").asString())).isTrue());
+    }
+
+    byte[] photo(int color) throws Exception {
+        var image = new java.awt.image.BufferedImage(4, 4, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        image.setRGB(0, 0, color);
+        var output = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(image, "png", output);
+        return output.toByteArray();
+    }
+
+    HttpResponse<String> uploadPhoto(String id, byte[] bytes, int actor) throws Exception {
+        String boundary = "boundary-evidence-test";
+        var body = new java.io.ByteArrayOutputStream();
+        body.write(
+            (
+                "--" +
+                boundary +
+                "\r\nContent-Disposition: form-data; name=\"file\"; filename=\"photo.png\"\r\nContent-Type: image/png\r\n\r\n"
+            ).getBytes(java.nio.charset.StandardCharsets.UTF_8)
+        );
+        body.write(bytes);
+        body.write(("\r\n--" + boundary + "--\r\n").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        var builder = HttpRequest.newBuilder(
+            URI.create("http://127.0.0.1:" + port + "/api/aftersales/" + id + "/evidence")
+        )
+            .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+            .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()));
+        if (actor >= 0) builder.header("Authorization", "Bearer " + tokens.get(actor));
+        try (var client = HttpClient.newHttpClient()) {
+            return client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+        }
+    }
+
+    @Test
+    void evidenceRequiresOwnershipAndRemainsReadableAfterReview() throws Exception {
+        String id = create(1);
+        byte[] photo = photo(100);
+        expect(uploadPhoto(id, photo, -1), 401);
+        expect(uploadPhoto(id, photo, 1), 404);
+        String imageId = expect(uploadPhoto(id, photo, 0), 200)
+            .path("id")
+            .asString();
+        assertThat(
+            expect(uploadPhoto(id, photo, 0), 200)
+                .path("id")
+                .asString()
+        ).isEqualTo(imageId);
+        expect(call("GET", "/aftersales/" + id + "/evidence", null, 1), 404);
+        expect(call("GET", "/staff/aftersales/" + id + "/evidence", null, 0), 403);
+        assertThat(expect(call("GET", "/staff/aftersales/" + id + "/evidence", null, 2), 200).size()).isEqualTo(1);
+        String contentPath = "/aftersales/" + id + "/evidence/" + imageId + "/content";
+        expect(call("GET", contentPath, null, 1), 404);
+        try (var client = HttpClient.newHttpClient()) {
+            var response = client.send(
+                HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/staff" + contentPath))
+                    .header("Authorization", "Bearer " + tokens.get(2))
+                    .GET()
+                    .build(),
+                HttpResponse.BodyHandlers.ofByteArray()
+            );
+            assertThat(response.statusCode()).isEqualTo(200);
+            assertThat(response.headers().firstValue("Content-Type").orElse("")).contains("image/png");
+            assertThat(response.headers().firstValue("Cache-Control").orElse("")).contains("no-store");
+            assertThat(
+                javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(response.body())).getWidth()
+            ).isEqualTo(4);
+        }
+        String other = create(1);
+        expect(call("GET", "/aftersales/" + other + "/evidence/" + imageId + "/content", null, 0), 404);
+        approve(id);
+        expect(uploadPhoto(id, photo(200), 0), 409);
+        expect(uploadPhoto(id, photo, 0), 200);
+        assertThat(expect(call("GET", "/aftersales/" + id + "/evidence", null, 0), 200).size()).isEqualTo(1);
+    }
+
+    @Test
+    void evidenceRejectsInvalidFilesAndConcurrentOverflow() throws Exception {
+        String id = create(1);
+        expect(uploadPhoto(id, "<svg>not a PNG</svg>".getBytes(), 0), 400);
+        expect(uploadPhoto(id, new byte[0], 0), 400);
+        expect(uploadPhoto(id, new byte[5 * 1024 * 1024 + 1], 0), 413);
+        for (int i = 0; i < 4; i++) expect(uploadPhoto(id, photo(i), 0), 200);
+        try (var pool = Executors.newFixedThreadPool(2)) {
+            var gate = new CountDownLatch(1);
+            var first = pool.submit(() -> {
+                gate.await();
+                return uploadPhoto(id, photo(101), 0).statusCode();
+            });
+            var second = pool.submit(() -> {
+                gate.await();
+                return uploadPhoto(id, photo(102), 0).statusCode();
+            });
+            gate.countDown();
+            assertThat(
+                List.of(first.get(15, TimeUnit.SECONDS), second.get(15, TimeUnit.SECONDS))
+            ).containsExactlyInAnyOrder(200, 409);
+        }
+        assertThat(expect(call("GET", "/aftersales/" + id + "/evidence", null, 0), 200).size()).isEqualTo(5);
     }
 
     @Test

@@ -111,7 +111,7 @@ public class AgentService {
                     if (execution.content.isEmpty()) execution.end("FAILED", "模型没有返回有效回答，请重试", false);
                     else execution.end("SUCCEEDED", null, false);
                 } catch (Exception ex) {
-                    execution.end("FAILED", "智能助手暂时无法完成请求，请检查模型服务、网络或登录状态后重试", false);
+                    execution.end("FAILED", AgentExecutionException.publicMessage(ex), false);
                 }
             });
         } catch (RejectedExecutionException ex) {

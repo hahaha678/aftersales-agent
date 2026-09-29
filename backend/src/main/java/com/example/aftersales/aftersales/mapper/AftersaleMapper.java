@@ -8,6 +8,30 @@ import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface AftersaleMapper {
+    // 一次 SQL 汇总占用量并筛选可申请商品，避免模型逐订单调用资格工具。
+    @Select(
+        """
+        SELECT CAST(o.id AS CHAR) AS order_id, o.order_number, CAST(i.id AS CHAR) AS order_item_id,
+            i.product_name, CAST(i.quantity-COALESCE(SUM(a.quantity),0) AS SIGNED) AS available_quantity,
+            CAST(i.paid_amount-COALESCE(SUM(a.amount),0) AS CHAR) AS remaining_amount
+        FROM trade_order o JOIN order_item i ON i.order_id=o.id
+        LEFT JOIN aftersale_request a ON a.order_item_id=i.id
+            AND a.status IN ('PENDING','APPROVED','RETURN_SHIPPED','RETURN_RECEIVED','REFUND_PENDING','REFUND_FAILED','COMPLETED')
+        WHERE o.user_id=#{userId} AND o.status='COMPLETED'
+            AND o.signed_at <= #{now} AND o.signed_at > DATE_SUB(#{now}, INTERVAL 7 DAY)
+            AND i.paid_amount > 0
+        GROUP BY o.id,o.order_number,o.created_at,i.id,i.product_name,i.quantity,i.paid_amount
+        HAVING available_quantity > 0
+        ORDER BY o.created_at DESC,o.id DESC,i.id
+        LIMIT 11 OFFSET #{offset}
+        """
+    )
+    List<com.example.aftersales.aftersales.domain.vo.EligibleItemsVO.Item> eligibleItems(
+        @Param("userId") long userId,
+        @Param("now") java.time.LocalDateTime now,
+        @Param("offset") long offset
+    );
+
     @Select("SELECT * FROM trade_order WHERE id=#{id} FOR UPDATE")
     OrderPO lockOrder(long id);
 
