@@ -1,5 +1,7 @@
 # DeepSeek 售后 Agent（第一版）
 
+2026-09-29 新增 `searchPolicies` 政策检索工具及持久化来源卡片。Ollama 配置、V5 迁移及知识库发布流程见 [RAG 说明](KNOWLEDGE_RAG.md)。真实本地向量模型待用户安装后联调；下方首轮评测记录保持原范围。
+
 ## 启动与配置
 
 保留原有 local、MySQL、Redis 配置，在 IDEA 的后端 Run Configuration → Environment variables 中增加：

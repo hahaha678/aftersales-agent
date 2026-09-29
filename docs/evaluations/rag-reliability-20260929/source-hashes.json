@@ -1,0 +1,34 @@
+[
+  {
+    "path": "backend/src/main/java/com/example/aftersales/agent/config/DeepSeekGateway.java",
+    "sha256": "B507FA0050327D560D720B983F71AC02685F16F1346676BE2715798AC2B46AFF"
+  },
+  {
+    "path": "backend/src/main/java/com/example/aftersales/agent/service/AgentTools.java",
+    "sha256": "E0FAADFE6B767D635AC06907A8B50D87CA72A45B4737253BF099B8071A1E2F67"
+  },
+  {
+    "path": "backend/src/main/java/com/example/aftersales/agent/service/AgentPolicySearch.java",
+    "sha256": "EDDBE6D62A89A467F1B7DDA4F73983A2F18AAEC6678BE468F30B4FB247C26E15"
+  },
+  {
+    "path": "backend/src/main/java/com/example/aftersales/agent/domain/query/PolicyToolQuery.java",
+    "sha256": "E5C7E00BB37757BDEC09BCD2BBCBA42B258E4C95AA8A7601FD828015F6FE1007"
+  },
+  {
+    "path": "backend/src/main/java/com/example/aftersales/agent/domain/vo/AgentEligibilityVO.java",
+    "sha256": "90827B39E573DC0E91BFB61C7A744DA052D4743D475DD6B451BBD9D4634AAE5E"
+  },
+  {
+    "path": "backend/src/test/java/com/example/aftersales/AgentReliabilityTest.java",
+    "sha256": "FEE1FA2A2BDD925FDB231AEA68DB45FD289354B15D0DF39142F11BBDE283BC21"
+  },
+  {
+    "path": "backend/src/test/java/com/example/aftersales/RealRagBaselineTest.java",
+    "sha256": "A52764FCBCC4D19D9C6E681FA073E6D5990539A3236661C04C414A51D324F1AF"
+  },
+  {
+    "path": "backend/src/test/resources/evaluation/rag-baseline-v1.json",
+    "sha256": "3954BD1E79BED77C696C217B6A272EEFC998A66162CA73965406642870D22A12"
+  }
+]

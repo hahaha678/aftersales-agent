@@ -1,0 +1,99 @@
+package com.example.aftersales;
+
+import static org.assertj.core.api.Assertions.*;
+
+import com.example.aftersales.aftersales.domain.vo.EligibilityVO;
+import com.example.aftersales.agent.domain.query.PolicyToolQuery;
+import com.example.aftersales.agent.domain.vo.AgentEligibilityVO;
+import com.example.aftersales.agent.service.AgentPolicySearch;
+import com.example.aftersales.knowledge.domain.query.PolicySearchQuery;
+import com.example.aftersales.knowledge.domain.vo.*;
+import java.time.OffsetDateTime;
+import java.util.*;
+import org.junit.jupiter.api.Test;
+
+class AgentReliabilityTest {
+
+    private static final PolicySearchVO EMPTY = new PolicySearchVO("未检索到依据", List.of());
+    private static final PolicySearchVO FOUND = new PolicySearchVO(
+        "政策原文",
+        List.of(new PolicySourceVO("source", "policy", "演示保修", 1, "MOUSE", "联系人工核实", "/policies/policy", 0.8))
+    );
+
+    @Test
+    void formatsDeadlineAcrossDateBoundaryWithoutChangingBusinessValues() {
+        var item = new EligibilityVO.Item("1", "鼠标", 1, "99.00", false, "超期");
+        var original = new EligibilityVO("2", "v1", OffsetDateTime.parse("2026-09-28T20:05:06Z"), List.of(item));
+        var shown = AgentEligibilityVO.from(original);
+        assertThat(shown.deadline()).isEqualTo("2026-09-29 04:05:06 （北京时间 UTC+08:00）");
+        assertThat(shown.items()).containsExactly(item);
+        assertThat(original.deadline().getHour()).isEqualTo(20);
+        assertThat(AgentEligibilityVO.from(new EligibilityVO("2", "v1", null, List.of())).deadline()).isNull();
+        assertThat(
+            AgentEligibilityVO.from(
+                new EligibilityVO("2", "v1", OffsetDateTime.parse("2026-09-29T04:05:06+08:00"), List.of())
+            ).deadline()
+        ).isEqualTo(shown.deadline());
+    }
+
+    @Test
+    void retriesEmptyResultOncePerRunAndKeepsScope() {
+        var calls = new ArrayList<PolicySearchQuery>();
+        var search = new AgentPolicySearch(q -> {
+            calls.add(q);
+            return EMPTY;
+        });
+        search.search(new PolicyToolQuery("原问题", "HEADPHONE", "同义问题"));
+        search.search(new PolicyToolQuery("另一问题", "HEADPHONE", "另一次改写"));
+        assertThat(calls).containsExactly(
+            new PolicySearchQuery("原问题", "HEADPHONE"),
+            new PolicySearchQuery("同义问题", "HEADPHONE"),
+            new PolicySearchQuery("另一问题", "HEADPHONE")
+        );
+    }
+
+    @Test
+    void returnsFallbackSourcesAndDoesNotRetryWhenFirstSearchHasEvidence() {
+        var calls = new ArrayList<PolicySearchQuery>();
+        var search = new AgentPolicySearch(q -> {
+            calls.add(q);
+            return q.question().equals("原问题") ? EMPTY : FOUND;
+        });
+        var result = search.search(new PolicyToolQuery("原问题", "MOUSE", "保修条件"));
+        assertThat(result.sources()).isEqualTo(FOUND.sources());
+        assertThat(result.message()).contains("保修条件");
+        var hit = new AgentPolicySearch(q -> {
+            calls.add(q);
+            return FOUND;
+        });
+        hit.search(new PolicyToolQuery("直接命中", "MOUSE", "不应执行"));
+        assertThat(calls).hasSize(3);
+    }
+
+    @Test
+    void ignoresAbsentBlankOrIdenticalRewriteWithoutSpendingFallbackBudget() {
+        var calls = new ArrayList<PolicySearchQuery>();
+        var search = new AgentPolicySearch(q -> {
+            calls.add(q);
+            return EMPTY;
+        });
+        for (String fallback : Arrays.asList(null, " ", " 原问题 ", "有效改写")) {
+            search.search(new PolicyToolQuery("原问题", "MOUSE", fallback));
+        }
+        assertThat(calls).hasSize(5);
+        assertThat(calls.getLast().question()).isEqualTo("有效改写");
+    }
+
+    @Test
+    void doesNotRetryServiceFailure() {
+        var calls = new ArrayList<PolicySearchQuery>();
+        var search = new AgentPolicySearch(q -> {
+            calls.add(q);
+            throw new IllegalStateException("unavailable");
+        });
+        assertThatThrownBy(() -> search.search(new PolicyToolQuery("原问题", "MOUSE", "改写"))).isInstanceOf(
+            IllegalStateException.class
+        );
+        assertThat(calls).hasSize(1);
+    }
+}

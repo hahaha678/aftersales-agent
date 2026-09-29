@@ -1,6 +1,6 @@
 # 电商智能售后 Agent
 
-个人学习与简历项目。当前包含 Vue 3 + TypeScript 登录、订单列表与详情页面，MyBatis 数据访问层，MySQL + Redis 会话认证，以及当前用户订单和物流查询。前端已接入六个认证与订单接口；售后申请、资格查询、撤销和客服审核已实现；退回物流、实际退款、RAG 和 Agent 对话待实现。验证范围见 frontend/README.md。
+个人学习与简历项目。已包含 Vue 3 + TypeScript 页面、MyBatis 数据访问、MySQL + Redis 会话认证、订单物流、售后申请及审核、DeepSeek Agent 与草稿确认。新增政策知识库：客服录入发布、本地 Embedding、原文检索与回答来源追溯。Ollama 安装及使用见 [RAG 启动说明](docs/KNOWLEDGE_RAG.md)；已完成 15 个场景的真实模型评测，结果见 [RAG 基线报告](docs/evaluations/rag-baseline-v1-20260929/REPORT.md)。退回物流和实际退款仍待实现。
 
 ## 技术选择
 
@@ -15,8 +15,8 @@
 | 数据库迁移 | Flyway，版本由 Spring Boot 管理 |
 
 Spring AI 2.0 与 Spring Boot 4.0/4.1 的兼容关系见[官方文档](https://docs.spring.io/spring-ai/reference/getting-started.html)。
-模型供应商未确定，当前未添加供应商 Starter、未创建 ChatModel，也不会发送付费 API 请求。
-后续选择供应商时接入对应 Starter 和环境变量；MySQL 业务库不承担向量检索，向量存储在 RAG 阶段单独选择。
+启用 Agent 并配置密钥后会调用真实模型；真实模型评测需显式启用，可能产生 API 费用。
+当前使用 DeepSeek 生成回答、Ollama 生成政策向量。第一版向量以 JSON 存在 MySQL，由 Java 计算相似度，适合小规模知识库；后续可迁移专用向量索引。
 
 ## IDEA 导入
 
@@ -58,7 +58,7 @@ DB_PASSWORD=你的本地密码
 
 默认连接 127.0.0.1:3306/aftersales_agent，可通过 DB_HOST、DB_PORT、DB_NAME 修改。
 `.env.example` 是配置说明，Spring Boot 不会自动读取 `.env`；请通过 IDEA 或终端设置变量。
-local 启动会执行尚未应用的 V1–V4 迁移，创建基础业务、售后、Agent 会话与草稿表及 Flyway 历史表。
+local 启动会执行尚未应用的 V1–V5 迁移，创建业务、会话、草稿、政策与向量来源表及 Flyway 历史表。
 数据库不可用或迁移失败时启动应失败；不会自动切换到无数据库模式。
 不要同时启用 scaffold 和 local。已在隔离的 MySQL 8.0.43 实例验证迁移，尚未读取或使用你日常数据库的密码，也未迁移 3306 上的数据库。
 数据库使用 UTC 存储时间，API 返回带偏移的 ISO-8601 时间。
@@ -123,4 +123,4 @@ ScaffoldSmokeTest 使用随机端口启动真实 HTTP 服务，验证无数据�
 
 真实模型基线评测已提供 10 个场景、一键隔离运行脚本和自动检查报告，见 [评测说明](docs/AGENT_EVALUATION.md)。运行前需要当前终端可读取的 DeepSeek 密钥；模拟演练结果不作为真实模型成绩。
 
-已实现工具查询、多轮会话、SSE 回复、历史恢复、任务取消以及草稿确认建单。配置方式、执行边界和联调示例见 [Agent 接入说明](docs/AGENT.md)。后端设置 AI_ENABLED=true 和 DEEPSEEK_API_KEY 后重启，从前端“智能售后”进入；密钥不能放到 Vue 环境变量或 Git。V4 迁移自动执行，未配置模型不影响普通业务。RAG 政策检索、换货和实际退款尚未实现。
+已实现工具查询、多轮会话、SSE 回复、历史恢复、任务取消以及草稿确认建单。配置方式、执行边界和联调示例见 [Agent 接入说明](docs/AGENT.md)。后端设置 AI_ENABLED=true 和 DEEPSEEK_API_KEY 后重启，从前端“智能售后”进入；密钥不能放到 Vue 环境变量或 Git。未配置模型不影响普通业务。RAG 政策检索已接入，需配置本地 Embedding 并发布资料，见 [RAG 说明](docs/KNOWLEDGE_RAG.md)。换货和实际退款尚未实现。

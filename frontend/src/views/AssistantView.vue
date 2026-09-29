@@ -2,6 +2,7 @@
 import { ref, computed, watch, onBeforeUnmount, nextTick } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import * as api from '../api/agent'
+import { runSources, type PolicySource } from '../api/knowledge'
 import { reasons } from '../api/aftersales'
 import { money, dateTime } from '../utils/format'
 import { session } from '../state/session'
@@ -16,6 +17,14 @@ const draftStatusLabels: Record<string, string> = {
 }
 const route = useRoute(),
     router = useRouter()
+const sourceRows = ref<Record<string, PolicySource[]>>({})
+async function showSources(id: string) {
+    try {
+        sourceRows.value[id] = await runSources(id)
+    } catch (cause) {
+        error.value = cause
+    }
+}
 const list = ref<api.Conversation[]>([]),
     history = ref<api.Message[]>([]),
     cards = ref<api.Draft[]>([])
@@ -303,6 +312,17 @@ void refresh()
                 >
                     <strong>{{ message.role === 'USER' ? '你' : '售后助手' }}</strong>
                     <p>{{ message.content || (message.status === 'RUNNING' ? '正在处理…' : '本次未生成回答') }}</p>
+                    <template v-if="message.role === 'ASSISTANT' && message.status !== 'RUNNING'">
+                        <button class="text-button" @click="showSources(message.runId)">查看本次检索来源</button>
+                        <div v-if="sourceRows[message.runId]">
+                            <p v-if="!sourceRows[message.runId]?.length">本次没有检索到政策来源。</p>
+                            <details v-for="source in sourceRows[message.runId]" :key="source.sourceId">
+                                <summary>{{ source.title }} · v{{ source.version }}</summary>
+                                <p>{{ source.excerpt }}</p>
+                                <RouterLink :to="'/policies/' + source.policyId">查看政策原文</RouterLink>
+                            </details>
+                        </div>
+                    </template>
                     <small v-if="message.role === 'ASSISTANT' && ['FAILED', 'CANCELLED'].includes(message.status)"
                         >{{ message.status === 'CANCELLED' ? '已停止' : '未完成' }} · 此回复可能不完整</small
                     >

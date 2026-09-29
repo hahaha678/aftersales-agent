@@ -31,6 +31,13 @@ springdoc:
         persist-authorization: false
 
 app:
+    knowledge:
+        provider: ${EMBEDDING_PROVIDER:disabled}
+        base-url: ${EMBEDDING_BASE_URL:http://127.0.0.1:11434}
+        model: ${EMBEDDING_MODEL:}
+        api-key: ${EMBEDDING_API_KEY:}
+        min-score: ${KNOWLEDGE_MIN_SCORE:0.65}
+        hybrid-search: ${KNOWLEDGE_HYBRID_SEARCH:true}
     agent:
         enabled: ${AI_ENABLED:false}
         api-key: ${DEEPSEEK_API_KEY:}

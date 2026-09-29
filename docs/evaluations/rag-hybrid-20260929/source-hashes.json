@@ -1,0 +1,42 @@
+[
+  {
+    "path": "backend/src/main/java/com/example/aftersales/knowledge/service/PolicyHybridSearch.java",
+    "sha256": "137A3CDFE230F05514B66F87B74D9EF9ED23D6B66DEF9D6E568EDA134AD13F27"
+  },
+  {
+    "path": "backend/src/main/java/com/example/aftersales/knowledge/service/PolicyService.java",
+    "sha256": "91BF8AAB3E49D633DB6ED88672CC47150D105D5D6A8748E7F3E27791725BC8AB"
+  },
+  {
+    "path": "backend/src/main/java/com/example/aftersales/agent/service/AgentPolicySearch.java",
+    "sha256": "E352FB1B676FE7D8858705AE0B8A44C7AA331A654130C05FAA42300DDB3BBFE9"
+  },
+  {
+    "path": "backend/src/main/java/com/example/aftersales/agent/config/DeepSeekGateway.java",
+    "sha256": "460BBDFFAB4B406745A1F45813E3A2710F4734A7AE801FD8847F9A1600C319AE"
+  },
+  {
+    "path": "backend/src/test/java/com/example/aftersales/RealRagBaselineTest.java",
+    "sha256": "08135B3D28674BCA19C03209B3D30C9AF6E86BD846458753EB6454F9DFB10CE8"
+  },
+  {
+    "path": "backend/src/test/java/com/example/aftersales/PolicyIntegrationTest.java",
+    "sha256": "48D890D7AAAA7422B18EDB70855D86C09A4962084342D5D2E099CC61EBE8FCF5"
+  },
+  {
+    "path": "backend/src/test/java/com/example/aftersales/PolicyHybridSearchTest.java",
+    "sha256": "869D77F192DC105860F4138A46764FB06BEFC401CF3BF5226C631D2C9EAB12F1"
+  },
+  {
+    "path": "backend/src/test/java/com/example/aftersales/AgentReliabilityTest.java",
+    "sha256": "0921E1145D2C01F1E4F72E3F45CB461D97DE21E9FBCE1D49BD0E49A27B34C60A"
+  },
+  {
+    "path": "backend/src/main/resources/application.yml",
+    "sha256": "9D388EF4939B6E794DECA05DF04A0D04983B3D7FE3C9998EAA510943E80EE9F3"
+  },
+  {
+    "path": "backend/src/test/resources/evaluation/rag-baseline-v1.json",
+    "sha256": "3954BD1E79BED77C696C217B6A272EEFC998A66162CA73965406642870D22A12"
+  }
+]

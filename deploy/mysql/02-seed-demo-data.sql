@@ -2,7 +2,8 @@
 -- 本文件自动选择 aftersales_agent 库并开启本次导入。
 -- 前提：已通过 Spring Boot local 配置执行 Flyway V1、V2，创建业务表。
 -- 仅用于本机开发库；首次要求业务表为空，重复导入会跳过，不覆盖已有数据。
--- 三个演示账号的公开密码均为 DemoPass123!，不得用于生产环境。
+-- 三个演示账号的公开密码均为 123，不得用于生产环境。
+-- 已导入的账号请执行 03-reset-demo-passwords.sql；重复运行本种子脚本不会覆盖密码。
 USE aftersales_agent;
 SET @allow_demo_seed = 1;
 SET NAMES utf8mb4;
@@ -44,7 +45,7 @@ seed: BEGIN
 
     -- PBKDF2-HMAC-SHA256, 600000 iterations, 16-byte salt, 32-byte key.
     -- {pbkdf2} + hex(salt || derived key). See DATABASE_DESIGN.md for encoder settings.
-    SET @demo_hash = '{pbkdf2}4e33cdf6e04603b47b210789623049e7a052c02b3fd520506d562848c9c68a7cf060783cbf9060b8b2f05e25d2601c80';
+    SET @demo_hash = '{pbkdf2}a3871b1ca1b54129ba0f17c2e3fe957dca5741fe4dbdbf3be0e87e3a6cfb331ae8e75f684c23f20d0b06a73081d24769';
     SET @demo_now = UTC_TIMESTAMP(3);
     INSERT INTO app_user (id, username, password_hash, display_name, role) VALUES
         (1, 'demo_customer', @demo_hash, '演示买家', 'CUSTOMER'),

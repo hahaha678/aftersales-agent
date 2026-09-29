@@ -1,0 +1,299 @@
+package com.example.aftersales;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.example.aftersales.agent.config.DeepSeekGateway;
+import java.nio.file.*;
+import java.time.*;
+import java.util.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.context.annotation.*;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.*;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+
+/** 明确启用才调用真实 Ollama/DeepSeek；复用已验证的 HTTP/SSE 执行器，业务和评语分开记录。 */
+@EnabledIfEnvironmentVariable(named = "RAG_EVAL_ENABLED", matches = "true")
+@ActiveProfiles("local")
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = {
+        "spring.datasource.url=${EVAL_DB_URL}",
+        "spring.datasource.username=${EVAL_DB_USERNAME}",
+        "spring.datasource.password=${EVAL_DB_PASSWORD}",
+        "spring.data.redis.host=127.0.0.1",
+        "spring.data.redis.port=${EVAL_REDIS_PORT}",
+        "spring.data.redis.password=",
+        "app.auth.cache.namespace=rag-eval-${random.uuid}",
+        "app.agent.enabled=true",
+        "app.agent.api-key=${DEEPSEEK_API_KEY:}",
+        "app.agent.base-url=https://api.deepseek.com",
+        "app.knowledge.provider=ollama",
+        "app.knowledge.base-url=http://127.0.0.1:11434",
+        "app.knowledge.model=bge-m3",
+        "app.knowledge.min-score=0.65",
+    }
+)
+@Import(RealRagBaselineTest.Config.class)
+class RealRagBaselineTest {
+
+    @DynamicPropertySource
+    static void guard(DynamicPropertyRegistry p) {
+        RealAgentBaselineTest.guard(p);
+    }
+
+    @TestConfiguration
+    static class Config {
+
+        @Bean
+        @Primary
+        RealAgentBaselineTest.EvalGateway ragGateway(DeepSeekGateway real) {
+            return new RealAgentBaselineTest.EvalGateway(real, 15);
+        }
+    }
+
+    @Value("${local.server.port}")
+    int port;
+
+    @Autowired
+    JdbcTemplate jdbc;
+
+    @Autowired
+    RealAgentBaselineTest.EvalGateway gateway;
+
+    static final JsonMapper JSON = JsonMapper.builder().build();
+    final List<Map<String, Object>> results = new ArrayList<>();
+    final Map<String, String> docKeys = new LinkedHashMap<>();
+    Path directory;
+    JsonNode suite;
+
+    @Test
+    void evaluateFifteenScenarios() throws Exception {
+        directory = Path.of(
+            "target/agent-evaluation/rag-real-" + Instant.now().toString().replace(":", "-")
+        ).toAbsolutePath();
+        Files.createDirectories(directory);
+        suite = JSON.readTree(Files.readString(Path.of("src/test/resources/evaluation/rag-baseline-v1.json")));
+        assertThat(suite.path("cases").size()).isEqualTo(15);
+        var harness = new RealAgentBaselineTest();
+        harness.port = port;
+        harness.jdbc = jdbc;
+        harness.gateway = gateway;
+        var staffFixture = harness.fixture("RAG-STAFF");
+        jdbc.update("UPDATE app_user SET role='STAFF' WHERE id=?", Long.parseLong(staffFixture.get("userId")));
+        String staff = login(harness, staffFixture.get("username"));
+        var corpus = JSON.readTree(Files.readString(Path.of("../docs/knowledge/demo-policies.json")));
+        Files.writeString(
+            directory.resolve("corpus.json"),
+            JSON.writerWithDefaultPrettyPrinter().writeValueAsString(corpus)
+        );
+        Files.writeString(
+            directory.resolve("cases.json"),
+            JSON.writerWithDefaultPrettyPrinter().writeValueAsString(suite)
+        );
+        for (var doc : corpus)
+            publish(
+                harness,
+                staff,
+                doc.path("policyKey").asString(),
+                1,
+                doc.path("title").asString(),
+                doc.path("scope").asString(),
+                doc.path("content").asString()
+            );
+        for (var scenario : suite.path("cases")) {
+            var result = new LinkedHashMap<String, Object>();
+            result.put("id", scenario.path("id").asString());
+            result.put("reviewCriteria", scenario.path("review").asString());
+            result.put("reviewStatus", "PENDING");
+            var checks = new ArrayList<String>();
+            result.put("businessFailures", checks);
+            try {
+                if (scenario.path("change").asString().equals("new-version")) {
+                    publish(
+                        harness,
+                        staff,
+                        "demo-mouse-materials",
+                        2,
+                        "演示政策：鼠标故障申请材料",
+                        "MOUSE",
+                        "仅用于本项目演示，不代表真实商家承诺。鼠标按键故障申请材料新版本：需填写故障表现、发生频率和已尝试的排查步骤，新增需要准备购买凭证供人工核实。可准备故障视频；本项目不支持上传附件。材料齐全不代表审核自动通过，提交仍需订单资格检查和用户确认。"
+                    );
+                }
+                if (scenario.path("change").asString().equals("archive-materials")) {
+                    String latest = jdbc.queryForObject(
+                        "SELECT id FROM knowledge_policy WHERE policy_key='demo-mouse-materials' AND status='PUBLISHED'",
+                        String.class
+                    );
+                    harness.call("POST", "/staff/policies/" + latest + "/archival", null, staff, 200);
+                }
+                var fixture = harness.fixture(scenario.path("id").asString());
+                String token = login(harness, fixture.get("username"));
+                String question = scenario
+                    .path("question")
+                    .asString()
+                    .replace("{expiredNumber}", fixture.get("expiredNumber"));
+                result.put("question", question);
+                long start = System.nanoTime();
+                var retrieved = harness.call(
+                    "POST",
+                    "/knowledge/searches",
+                    Map.of("question", question, "scope", scenario.path("scope").asString()),
+                    token,
+                    200
+                );
+                result.put("retrievalMs", (System.nanoTime() - start) / 1_000_000);
+                result.put("directRetrieval", retrieved);
+                String expected = scenario.path("expectedPolicy").asString();
+                result.put("expectedPolicy", expected);
+                var found = new LinkedHashSet<String>();
+                for (var source : retrieved.path("sources")) found.add(docKeys.get(source.path("policyId").asString()));
+                result.put("retrievedPolicyKeys", found);
+                result.put("expectedPolicyHit", expected.isBlank() ? null : found.contains(expected));
+                String conversation = harness
+                    .call("POST", "/conversations", Map.of("title", scenario.path("id").asString()), token, 201)
+                    .path("id")
+                    .asString();
+                var trace = new RealAgentBaselineTest.Trace(scenario.path("id").asString(), fixture);
+                gateway.trace = trace;
+                var turn = harness.execute(conversation, question, token, trace);
+                result.put("turn", turn);
+                var run = (JsonNode) turn.get("run");
+                if (!run.path("status").asString().equals("SUCCEEDED")) checks.add("TASK_NOT_SUCCEEDED");
+                var sources = harness.call(
+                    "GET",
+                    "/agent-runs/" + run.path("id").asString() + "/sources",
+                    null,
+                    token,
+                    200
+                );
+                result.put("agentSources", sources);
+                for (var source : sources) {
+                    String doc = source.path("policyId").asString();
+                    var original = harness.call("GET", "/policies/" + doc, null, token, 200);
+                    if (!original.path("content").asString().contains(source.path("excerpt").asString())) checks.add(
+                        "SOURCE_TEXT_MISMATCH"
+                    );
+                    if (!original.path("status").asString().equals("PUBLISHED")) checks.add("INACTIVE_SOURCE");
+                    if (
+                        scenario.path("id").asString().equals("R13") &&
+                        "demo-mouse-materials".equals(docKeys.get(doc)) &&
+                        source.path("version").asInt() != 2
+                    ) checks.add("OLD_VERSION_SOURCE");
+                    if (
+                        scenario.path("id").asString().equals("R14") && "demo-mouse-materials".equals(docKeys.get(doc))
+                    ) checks.add("ARCHIVED_SOURCE");
+                    if (
+                        scenario.path("id").asString().equals("R11") &&
+                        !source.path("scope").asString().equals("GLOBAL")
+                    ) checks.add("WRONG_SCOPE_SOURCE");
+                }
+                if (
+                    scenario.path("id").asString().equals("R15") &&
+                    trace.tools.stream().noneMatch(t -> t.get("tool").equals("getAftersaleEligibility"))
+                ) checks.add("MISSING_ORDER_ELIGIBILITY_QUERY");
+                if (
+                    jdbc.queryForObject(
+                        "SELECT COUNT(*) FROM aftersale_draft WHERE run_id=?",
+                        Integer.class,
+                        run.path("id").asString()
+                    ) != 0
+                ) checks.add("UNEXPECTED_DRAFT");
+            } catch (Exception | AssertionError ex) {
+                checks.add("EXECUTION_ERROR:" + ex.getClass().getSimpleName());
+            }
+            results.add(result);
+            save();
+        }
+        assertThat(results).hasSize(15);
+        Files.writeString(
+            directory.resolve("policy-versions.json"),
+            JSON.writerWithDefaultPrettyPrinter().writeValueAsString(
+                harness.call("GET", "/staff/policies", null, staff, 200)
+            )
+        );
+    }
+
+    String login(RealAgentBaselineTest h, String name) throws Exception {
+        return h
+            .call("POST", "/sessions", Map.of("username", name, "password", "DemoPass123!"), null, 201)
+            .path("accessToken")
+            .asString();
+    }
+
+    void publish(
+        RealAgentBaselineTest h,
+        String token,
+        String key,
+        int version,
+        String title,
+        String scope,
+        String content
+    ) throws Exception {
+        var body = Map.of(
+            "policyKey",
+            key,
+            "version",
+            version,
+            "title",
+            title,
+            "scope",
+            scope,
+            "content",
+            content,
+            "effectiveFrom",
+            LocalDate.now().minusDays(1).toString(),
+            "effectiveUntil",
+            LocalDate.now().plusDays(30).toString()
+        );
+        String id = h.call("POST", "/staff/policies", body, token, 201).path("id").asString();
+        docKeys.put(id, key);
+        h.call("POST", "/staff/policies/" + id + "/publication", null, token, 200);
+    }
+
+    void save() throws Exception {
+        var report = new LinkedHashMap<String, Object>();
+        report.put("suiteVersion", "rag-baseline-v1");
+        report.put("mode", "REAL_OLLAMA_AND_DEEPSEEK");
+        report.put("createdAt", Instant.now().toString());
+        report.put("model", gateway.model());
+        report.put("embeddingModel", "bge-m3");
+        report.put("embeddingDigest", System.getenv().getOrDefault("EVAL_EMBEDDING_DIGEST", "unknown"));
+        report.put(
+            "settings",
+            Map.of(
+                "minScore",
+                0.65,
+                "topK",
+                4,
+                "chunkCodePoints",
+                600,
+                "overlapCodePoints",
+                80,
+                "temperature",
+                0.2,
+                "maxOutputTokensPerRequest",
+                2048,
+                "maxTurns",
+                15
+            )
+        );
+        report.put("codeRevision", System.getenv("EVAL_CODE_REVISION"));
+        report.put("workingTreeDirty", System.getenv("EVAL_WORKTREE_DIRTY"));
+        report.put("policyIdToKey", docKeys);
+        report.put("completedCases", results.size());
+        report.put("cases", results);
+        report.put(
+            "scope",
+            "HTTP/SSE real Agent; direct retrieval uses specified scope while model chooses its own tool arguments; assistant review required for faithfulness"
+        );
+        Files.writeString(
+            directory.resolve("results.json"),
+            JSON.writerWithDefaultPrettyPrinter().writeValueAsString(report)
+        );
+    }
+}

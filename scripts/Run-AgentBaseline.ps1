@@ -1,6 +1,8 @@
 [CmdletBinding()]
 param(
     [switch]$DryRun,
+    [switch]$KnowledgeTest,
+    [switch]$RagEvaluation,
     [string]$KeyFile,
     [string]$MySqlBin = 'D:\Program Files\MySQL\MySQL Server 8.0\bin',
     [string]$RedisBin = 'E:\Redis-x64-5.0.14.1',
@@ -13,7 +15,7 @@ $backend = Join-Path $workspace 'backend'
 $root = Join-Path $backend 'target/agent-evaluation'
 New-Item -ItemType Directory -Force -Path $root | Out-Null
 # Only this explicitly named variable/file is read. Never echo credentials.
-$names = @('DEEPSEEK_API_KEY','AGENT_EVAL_ENABLED','AGENT_EVAL_MODE','EVAL_DB_URL','EVAL_DB_USERNAME','EVAL_DB_PASSWORD','EVAL_REDIS_PORT','EVAL_CODE_REVISION','EVAL_WORKTREE_DIRTY')
+$names = @('DEEPSEEK_API_KEY','AGENT_EVAL_ENABLED','AGENT_EVAL_MODE','RAG_EVAL_ENABLED','EVAL_DB_URL','EVAL_DB_USERNAME','EVAL_DB_PASSWORD','EVAL_REDIS_PORT','EVAL_CODE_REVISION','EVAL_WORKTREE_DIRTY')
 $saved = @{}
 foreach ($name in $names) { $saved[$name] = [Environment]::GetEnvironmentVariable($name,'Process') }
 $mysqlProcess = $null
@@ -21,10 +23,11 @@ $redisProcess = $null
 $runtime = $null
 $exitStatus = 0
 try {
+    if ($RagEvaluation -and ($DryRun -or $KnowledgeTest)) { throw 'RagEvaluation cannot be combined with DryRun or KnowledgeTest.' }
     if ($KeyFile) {
         $env:DEEPSEEK_API_KEY = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $KeyFile)).Trim()
     }
-    if (-not $DryRun -and [string]::IsNullOrWhiteSpace($env:DEEPSEEK_API_KEY)) {
+    if (-not $DryRun -and -not $KnowledgeTest -and [string]::IsNullOrWhiteSpace($env:DEEPSEEK_API_KEY)) {
         @{status='BLOCKED'; reason='DEEPSEEK_API_KEY_MISSING'; realModelCalled=$false; time=[DateTimeOffset]::UtcNow.ToString('o')} |
             ConvertTo-Json | Set-Content -LiteralPath (Join-Path $root 'preflight.json') -Encoding utf8
         throw 'DEEPSEEK_API_KEY is missing. Set it in this terminal or pass -KeyFile with a local secret file. Do not paste it into chat.'
@@ -63,7 +66,8 @@ try {
     }
     if (-not $ready) { throw 'Evaluation services did not become ready.' }
     $env:AGENT_EVAL_ENABLED='true'
-    $env:AGENT_EVAL_MODE=if($DryRun){'DRY_RUN'}else{'REAL'}
+    $env:RAG_EVAL_ENABLED=if($RagEvaluation){'true'}else{'false'}
+    $env:AGENT_EVAL_MODE=if($KnowledgeTest){'KNOWLEDGE_INTEGRATION'}elseif($DryRun){'DRY_RUN'}else{'REAL'}
     $env:EVAL_DB_URL="jdbc:mysql://127.0.0.1:$MySqlPort/aftersales_agent_eval?serverTimezone=UTC&characterEncoding=UTF-8"
     $env:EVAL_DB_USERNAME='root'
     $env:EVAL_DB_PASSWORD=$password
@@ -72,10 +76,12 @@ try {
     $env:EVAL_WORKTREE_DIRTY=if(@(& git -C $workspace status --porcelain).Count -gt 0){'true'}else{'false'}
     Push-Location $backend
     try {
-        Write-Output "Running $($env:AGENT_EVAL_MODE): 10 scenarios, at most 11 conversation turns; no automatic retries."
-        & mvn -o "-Dmaven.repo.local=$(Join-Path $workspace '.m2-local')" '-Dtest=RealAgentBaselineTest' test *> (Join-Path $runtime 'maven.log')
+        $testName=if($RagEvaluation){'RealRagBaselineTest'}elseif($KnowledgeTest){'PolicyIntegrationTest,PolicyEmbeddingTest,DeepSeekProtocolTest'}else{'RealAgentBaselineTest'}
+        Write-Output "Running $testName ($($env:AGENT_EVAL_MODE)). KnowledgeTest uses mock embeddings and never calls DeepSeek."
+        & mvn -o "-Dmaven.repo.local=$(Join-Path $workspace '.m2-local')" "-Dtest=$testName" test *> (Join-Path $runtime 'maven.log')
         if ($LASTEXITCODE -ne 0) { throw "Evaluation runner failed. See $runtime/maven.log" }
-        Get-ChildItem -LiteralPath $root -Directory | Where-Object Name -Like $(if($DryRun){'dry-*'}else{'real-*'}) | Sort-Object Name -Descending | Select-Object -First 1 -ExpandProperty FullName
+        if($KnowledgeTest){Write-Output (Join-Path $runtime 'maven.log')}
+        else {Get-ChildItem -LiteralPath $root -Directory | Where-Object Name -Like $(if($RagEvaluation){'rag-real-*'}elseif($DryRun){'dry-*'}else{'real-*'}) | Sort-Object Name -Descending | Select-Object -First 1 -ExpandProperty FullName}
     } finally { Pop-Location }
 } catch {
     $exitStatus=1
@@ -99,4 +105,3 @@ try {
     foreach ($name in $names) { [Environment]::SetEnvironmentVariable($name,$saved[$name],'Process') }
 }
 exit $exitStatus
-

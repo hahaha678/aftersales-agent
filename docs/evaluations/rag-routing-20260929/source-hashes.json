@@ -1,0 +1,18 @@
+[
+  {
+    "path": "backend/src/main/java/com/example/aftersales/agent/config/DeepSeekGateway.java",
+    "sha256": "718888A5112D7BA55A5174EAE77E8155C902FFB59E81C482F6A7A9B620909E33"
+  },
+  {
+    "path": "backend/src/main/java/com/example/aftersales/agent/service/AgentTools.java",
+    "sha256": "5B4A03CE37F73F80C6C8D4E2DF29F48CD49E83DC3E2F15C0E0E54EF37E456634"
+  },
+  {
+    "path": "backend/src/test/java/com/example/aftersales/RealRagBaselineTest.java",
+    "sha256": "A52764FCBCC4D19D9C6E681FA073E6D5990539A3236661C04C414A51D324F1AF"
+  },
+  {
+    "path": "backend/src/test/resources/evaluation/rag-baseline-v1.json",
+    "sha256": "3954BD1E79BED77C696C217B6A272EEFC998A66162CA73965406642870D22A12"
+  }
+]

@@ -10,13 +10,13 @@ export class ApiError extends Error {
 }
 export async function request<T>(
     path: string,
-    options: { method?: string; body?: unknown; auth?: boolean; signal?: AbortSignal } = {},
+    options: { method?: string; body?: unknown; auth?: boolean; signal?: AbortSignal; timeoutMs?: number } = {},
 ): Promise<T> {
     const controller = new AbortController()
     const abort = () => controller.abort()
     options.signal?.addEventListener('abort', abort, { once: true })
     if (options.signal?.aborted) controller.abort()
-    const timer = window.setTimeout(abort, 10000)
+    const timer = window.setTimeout(abort, options.timeoutMs ?? 10000)
     const token = options.auth === false ? '' : session.token
     try {
         const response = await fetch(`/api${path}`, {

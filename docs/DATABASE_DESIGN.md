@@ -96,7 +96,7 @@ SOURCE deploy/mysql/02-seed-demo-data.sql;
 
 首次导入要求六张业务表为空；用事务插入全部数据和 project_metadata 中的 demo_seed_version=1。重复执行会跳过并保留现有修改，不重置数据或重复插入。导入失败会回滚业务数据；客户端若遇错中止，可能残留临时存储过程，下次执行会先清理该过程。不要在应用运行、真实业务库或多个终端中并行执行。
 
-三个演示账号为 demo_customer、demo_other、demo_staff，公开演示密码均为 `DemoPass123!`。手工导入后，可在 local 模式使用登录接口；scaffold 仍返回 501。不得用于部署环境。
+三个演示账号为 demo_customer、demo_other、demo_staff，公开演示密码均为 `123`。已导入的数据库可运行 `deploy/mysql/03-reset-demo-passwords.sql` 更新密码；种子脚本重复执行会跳过已有数据。数据库仍使用 PBKDF2 摘要保存密码。手工导入后，可在 local 模式使用登录接口；scaffold 仍返回 501。不得用于部署环境。隔离自动化测试的合成账号仍使用各自测试夹具密码。
 
 | 订单号 | 归属 | 场景 |
 | --- | --- | --- |

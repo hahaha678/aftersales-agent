@@ -96,9 +96,15 @@ class RealAgentBaselineTest {
         final DeepSeekGateway real;
         volatile Trace trace;
         int calls;
+        final int maxTurns;
 
         EvalGateway(DeepSeekGateway real) {
+            this(real, 11);
+        }
+
+        EvalGateway(DeepSeekGateway real, int maxTurns) {
             this.real = real;
+            this.maxTurns = maxTurns;
         }
 
         public boolean available() {
@@ -110,7 +116,7 @@ class RealAgentBaselineTest {
         }
 
         public void stream(List<RunPO> history, String message, List<ToolCallback> callbacks, Consumer<Chunk> sink) {
-            if (++calls > 11) throw new IllegalStateException("Evaluation turn budget exhausted");
+            if (++calls > maxTurns) throw new IllegalStateException("Evaluation turn budget exhausted");
             Trace current = trace;
             var wrapped = callbacks
                 .stream()

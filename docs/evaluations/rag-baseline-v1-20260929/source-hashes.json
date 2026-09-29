@@ -1,0 +1,686 @@
+[
+  {
+    "sha256": "3954bd1e79bed77c696c217b6a272eefc998a66162ca73965406642870d22a12",
+    "path": "backend/src/test\\resources\\evaluation\\rag-baseline-v1.json"
+  },
+  {
+    "sha256": "0d8fcc97628820c37ce5c856bb80c81f48c56ecaf1adb783d1cf4a2b5f562a39",
+    "path": "backend/src/test\\resources\\evaluation\\agent-baseline-v1.json"
+  },
+  {
+    "sha256": "313979f7059b403057c354dac3d70145427d855dbaf8b605ae9c399f98bd8296",
+    "path": "backend/src/test\\resources\\application-test.yml"
+  },
+  {
+    "sha256": "7cf89cb5355524a71645c78fde53d29724f0efb034d706454fbaa8db2f4534db",
+    "path": "backend/src/main\\resources\\application.yml"
+  },
+  {
+    "sha256": "6ebb9bfaf248a3a0a835e095007887fd744f58d7c55377801b6e9fb93d3fd434",
+    "path": "backend/src/main\\resources\\application-scaffold.yml"
+  },
+  {
+    "sha256": "05dffe43320641b88223872422c3f2e8b1179919400711d7b7a214d95c98d3de",
+    "path": "backend/src/main\\resources\\application-local.yml"
+  },
+  {
+    "sha256": "0e6c9323f3aa424735d647db8ac419101d6b6968aba5cacf5ddc15e76c7f8821",
+    "path": "backend/src/main\\resources\\mapper\\order\\ShipmentEventMapper.xml"
+  },
+  {
+    "sha256": "540c2aedaa1846df3f667a55defc1255fc4c0446fd8b7a33da4941c4839aee79",
+    "path": "backend/src/main\\resources\\mapper\\order\\OrderShipmentMapper.xml"
+  },
+  {
+    "sha256": "58e1bd23d4014ef9a9d977a3c69f7d1adb8a65a5fa53a84cfeaa85734c0acdd1",
+    "path": "backend/src/main\\resources\\mapper\\order\\OrderMapper.xml"
+  },
+  {
+    "sha256": "a1e7645e7c424344d2ecf8bbf75ff2b10818f6d9bf91d6136ff0f66e3080423d",
+    "path": "backend/src/main\\resources\\mapper\\order\\OrderItemMapper.xml"
+  },
+  {
+    "sha256": "04faf3309500fb2ef2d6efb6e28743953f13af94de3a93fc0f6d0fd1f0a2398b",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\SessionCacheIntegrationTest.java"
+  },
+  {
+    "sha256": "e0419a565c2cd6177d1f0b1509ba8521a80fa75e63520962251d8fa38df48c40",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\ScaffoldSmokeTest.java"
+  },
+  {
+    "sha256": "7f1a2293c2124f7c05e02abad57f89c5edc24d7236506b8f41faa06f1ef2c87b",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\RealRagBaselineTest.java"
+  },
+  {
+    "sha256": "215cbdcd1a7c2f8d8a0ca20ac2a6d9c1b505cff69edef3b7447be1214b26c8a9",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\RealAgentBaselineTest.java"
+  },
+  {
+    "sha256": "bc5d882f576d5e62d0b8ebe1ecf7fa3f0960b11010fde3469a859ca1dbabdfa3",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\PolicyIntegrationTest.java"
+  },
+  {
+    "sha256": "a3483ab16598027648a3d4bb71a29d9a1a79327dd9b4cfc5989e72ffaef5822a",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\PolicyEmbeddingTest.java"
+  },
+  {
+    "sha256": "5138a5a1b535d5b9be42f1ae2b7db409d0ac8fce38be6e2e9542fc91e48ac9b7",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\OrderQueryIntegrationTest.java"
+  },
+  {
+    "sha256": "72ca05d27f0c0da7e827c2577fcc0c852334dc8e65d75960651dca6aa0b22954",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\MapperIntegrationTest.java"
+  },
+  {
+    "sha256": "8c8e9187da9cdad6e5b3406d25d747715f15f86a0bf71d35f929722296fd4275",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\DeepSeekProtocolTest.java"
+  },
+  {
+    "sha256": "230d9c9dadc44f5674a2b29007f15bb71703144088f2ee109e10a0d7e65bc5d8",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\AuthenticationIntegrationTest.java"
+  },
+  {
+    "sha256": "2ac7965c02b042e6e698dd446ef3ee6696c0234543aba954fc797e866ae4a466",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\ApiContractTest.java"
+  },
+  {
+    "sha256": "ec48975942751c4bd20b1cf546f8c1d22ea689831e0cb6e22aea8915cf86f981",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\AgentIntegrationTest.java"
+  },
+  {
+    "sha256": "cdb4f9431143445abb8bab63ac92ef2b65108f4bbb10882203bf0191aa75fb51",
+    "path": "backend/src/test\\java\\com\\example\\aftersales\\AftersaleIntegrationTest.java"
+  },
+  {
+    "sha256": "3de1bae80881f876789d495d55f226a058bb6468929a5294057ce53729c18634",
+    "path": "backend/src/main\\resources\\mapper\\identity\\UserSessionMapper.xml"
+  },
+  {
+    "sha256": "11f54bcec2a15d4d529ad9ce6d4ee1417450fc57d9d4857c533f6b264210ab83",
+    "path": "backend/src/main\\resources\\mapper\\identity\\UserMapper.xml"
+  },
+  {
+    "sha256": "9f653019cbfcc4d0ef32c601f35ddaddc5b01e03476dab0f6dc9a8b91268bbf2",
+    "path": "backend/src/main\\resources\\db\\migration\\V2__create_identity_and_order_tables.sql"
+  },
+  {
+    "sha256": "65a223ecdd046e4d9ed355340866da42e9814a2b81057a5a2dea9f41fb4f3010",
+    "path": "backend/src/main\\resources\\db\\migration\\V1__create_project_metadata.sql"
+  },
+  {
+    "sha256": "0f82371eedac1fa9062321286f790a21216b97202c6de5936893762034a868ab",
+    "path": "backend/src/main\\resources\\db\\migration\\V3__create_aftersale_tables.sql"
+  },
+  {
+    "sha256": "a539c24de2174f4587bdd9060f6d830ffbdd46a0e4b1c02d7b1002b968d17dfa",
+    "path": "backend/src/main\\resources\\mapper\\aftersales\\AftersaleMapper.xml"
+  },
+  {
+    "sha256": "19dde2d78d9df55c15da0b0c46a87162aabe6bfae8b749819336b8cbb242ae6b",
+    "path": "backend/src/main\\resources\\db\\migration\\V4__create_agent_conversation_and_draft.sql"
+  },
+  {
+    "sha256": "10a701e6826c71225ab2236597c51eb842dd1ae67439a105198cdbcdd223bb65",
+    "path": "backend/src/main\\resources\\db\\migration\\V5__create_policy_knowledge.sql"
+  },
+  {
+    "sha256": "f69ec0e72268a6877703c238a904636e75f49e00e69dd8531df4b170028ecfde",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\service\\package-info.java"
+  },
+  {
+    "sha256": "dcd5447baeb81863d4501fe660e73e3571e3fbe5122d1d0a7752d4c6c82d08ad",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\service\\OrderService.java"
+  },
+  {
+    "sha256": "d02de25f51208a838547134d8de9f6271438a84f668de0eb86de48418a6ce3a3",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\package-info.java"
+  },
+  {
+    "sha256": "2c7442d0708649f41db93fa59800ea55b76c0b660f5a5910dedc0bd616b912e0",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\AftersalesApplication.java"
+  },
+  {
+    "sha256": "b474d4b3a78b64ca6d92618d64069bfa4024001b8e35edf5f8b666d6025a64a9",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\mapper\\ShipmentEventMapper.java"
+  },
+  {
+    "sha256": "aca2ea6c88030a15436643b82976f923d00c4e1d0df7c3ec34b64a5622323228",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\mapper\\package-info.java"
+  },
+  {
+    "sha256": "b7771e97c8c0cfb93a7c75f16e3c6f9c78a4afa410d184f9666b96ebea768329",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\mapper\\OrderShipmentMapper.java"
+  },
+  {
+    "sha256": "d7f23a86e49a77265ecd45dbba352274d193968f2e67e08dbfdcd31c32fbfd7b",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\mapper\\OrderMapper.java"
+  },
+  {
+    "sha256": "32d25dc4890d21039e1fddee8441fe6a44d4e8b96f66e04080c4843a81cc9c7a",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\mapper\\OrderItemMapper.java"
+  },
+  {
+    "sha256": "327b96becb37d5f16c4f1d5b2244b66f908242cf38bf58b119dfd2494abe7112",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\controller\\package-info.java"
+  },
+  {
+    "sha256": "f4403057d8c09569768111203b2b010292244f7f204b60ba37f7dc209c0475f4",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\controller\\OrderController.java"
+  },
+  {
+    "sha256": "1244835c970a5ecd8e46ba1557a149c85dfa09645206fe4ab2cc5efbe961b06a",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\OrderStatus.java"
+  },
+  {
+    "sha256": "00f0813473c3bd8cd790190bd9b3a33a4a299eb1f4c2ea0ec29b39fa5a8cc494",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\dto\\package-info.java"
+  },
+  {
+    "sha256": "466693d9221d6cffe5fcdc46be36cbaabccc85bf6a5395d6092b660f3beceb2f",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\vo\\ShipmentVO.java"
+  },
+  {
+    "sha256": "e874cabdfc1bcaf60b6242e41f41e76159b93a8a7ecc5685f78e5573906cc73a",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\vo\\package-info.java"
+  },
+  {
+    "sha256": "f054b64c00e624bb2aa63a636af8e94b08ba0dd6aac4b18a732e3ada22c399f7",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\vo\\OrderSummaryVO.java"
+  },
+  {
+    "sha256": "6354bac9e10fd27f5eef39d83fbd68fd9e67f76b134e0383420295c8d7dcf3b2",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\vo\\OrderPageVO.java"
+  },
+  {
+    "sha256": "e9eb3f957f86e91e15b91c03f0bbc3e53c7074599e317617910fe1d2dd9cff4f",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\vo\\OrderItemVO.java"
+  },
+  {
+    "sha256": "d73ff8a0a166ba17a642cf108072b7fd7ccace4e340ad05ab1fe6ca7acfb90c3",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\vo\\OrderDetailVO.java"
+  },
+  {
+    "sha256": "b47d1090c0456d5909385d744b86263b12bf333c0e213cdedc65458a18446f62",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\service\\package-info.java"
+  },
+  {
+    "sha256": "6eff699957991b28ee68fc6d976c63acc741eaaaab48bf76ace1dc1cce48e0bc",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\service\\ModelGateway.java"
+  },
+  {
+    "sha256": "feaf3388c0add22334ab91f57c096ceeb173d0dea1b4fe63866f1b7585bfb178",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\service\\AgentTools.java"
+  },
+  {
+    "sha256": "785bf10bb75cd3d1dbf6ff7dad8c71846c7d692488497b91eec57fc00910085d",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\service\\AgentService.java"
+  },
+  {
+    "sha256": "ce4ed40a3116de0d440bcebcd4db5fd218e39701a3aff4622be04b6b81c74fa9",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\package-info.java"
+  },
+  {
+    "sha256": "6bd9009f1cc735a91eaad738bf6514c2a46de3cbea6061bac348e8afa86c1666",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\query\\package-info.java"
+  },
+  {
+    "sha256": "ab2e1c69779b8943c2fd1d27f8db85c02e5b0e7f70a408fd226bdbcbdeef5bee",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\query\\OrderPageQuery.java"
+  },
+  {
+    "sha256": "88c27a3a46257d6a6cf8b9cd77a425ae45301c111a6bcde823c7cdf47c65b9d9",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\service\\package-info.java"
+  },
+  {
+    "sha256": "177dfff167db233075e32ada3034006e058a772d0bce7b613806e099f40c4f89",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\service\\AftersaleService.java"
+  },
+  {
+    "sha256": "7a7a5665ce474593ac8285c05b288eb5d6eb5b6e0c4a53d92db2edcc2fb1ba47",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\service\\AftersaleDraftService.java"
+  },
+  {
+    "sha256": "084eb6857de2f5da532ae0478d5afe3b115040ca0d9ba30ac300f082740db2d5",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\package-info.java"
+  },
+  {
+    "sha256": "0e9d0b858fe2d614705bf5439c7507fd189007684446b7f82149477a9f465593",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\service\\PolicyText.java"
+  },
+  {
+    "sha256": "2bc66a2915c171851e4eb765ad502c58884bc7f5f72a7f16a246370ee33a6442",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\service\\PolicyService.java"
+  },
+  {
+    "sha256": "a1f5e4f02193f95a2cfead19aad45807f493915e3e661b0eb0c31b183507454c",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\service\\PolicyFingerprint.java"
+  },
+  {
+    "sha256": "f59d4772c89726b59827bdad5c37393c4b5966b75543489e835c114af4dbd32c",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\service\\PolicyEmbedding.java"
+  },
+  {
+    "sha256": "e9f03c47ecae206c4b34556927b7e505ff675a077fefbecd9bc6dcd41df0b1f8",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\service\\package-info.java"
+  },
+  {
+    "sha256": "91381ff08a5f2052823ed8c55a7f7decaa08335e893e729cafe6a80b9f5d5b30",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\package-info.java"
+  },
+  {
+    "sha256": "ef62a4604d929b54e44412e68dba4873928b92ad2f658cb002ccf7699511b5ff",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\service\\SessionService.java"
+  },
+  {
+    "sha256": "ade694678d68993bc1706d8ee018becff92cfd0f34a64c3b0b6fab6de0a901a8",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\service\\package-info.java"
+  },
+  {
+    "sha256": "d885f67fa2d1aa8b5257d57fd9e03e4266378a97e563a8e40394a3537d70da10",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\service\\CurrentUserService.java"
+  },
+  {
+    "sha256": "592b32373ac7604247dd7c9f9f6ef9317aca9cf605f45f2e267a3406b9f5b856",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\service\\AuthFailure.java"
+  },
+  {
+    "sha256": "b0b2de5c45db6c00d678025a390f9632a095b6ae8e6915f99d1313a8e151b6f3",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\service\\package-info.java"
+  },
+  {
+    "sha256": "16a5bb09dbb4d6d56c2ead574a805b91f6d2b7b6e02c0a09d223f4c69301e06d",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\service\\ConversationService.java"
+  },
+  {
+    "sha256": "6fdc1a027c32f862c604c459b6c91c15f14314a5bb45880dd7f8645dcf3bca71",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\package-info.java"
+  },
+  {
+    "sha256": "bf74f0515f251f241300ccf7e4bbcc4deed8ecc3f944d26c3cf45bce59854194",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\controller\\package-info.java"
+  },
+  {
+    "sha256": "a508047da3561da374340872dc65508189a081e4d0bbbe540a821875ff8bcc3d",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\controller\\AftersaleController.java"
+  },
+  {
+    "sha256": "494159362389ac4c93c5f2046cee8c803cdc2cfbcfadf8f154b15aaef6a5c50e",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\mapper\\package-info.java"
+  },
+  {
+    "sha256": "48ab7b4e3b6c37763787e6ef44cd6ae1b2914c3f1d7b042ba7076bd0d885141e",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\mapper\\AftersaleMapper.java"
+  },
+  {
+    "sha256": "849ec216202bb5f09c6b4427b157784e9c51d7db628740a273873386362835b1",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\mapper\\AftersaleDraftMapper.java"
+  },
+  {
+    "sha256": "9008e1f976b16604a901b296a60d1471142f0021f1958c53117b5764b44c7ac3",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\mapper\\package-info.java"
+  },
+  {
+    "sha256": "881f9f2ea05ad49d37fe24eb5987bee3f8e6fa6d26093a703aef8fb941d1e564",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\vo\\PolicyVO.java"
+  },
+  {
+    "sha256": "21f4e34748868a3d24ee66843fa6abf4f34b8acb5d4ef48d243a37aa2214d22a",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\po\\ShipmentEventPO.java"
+  },
+  {
+    "sha256": "8b530500386991a61584a9b31b04e906e0bf7ca3405359772817c58c47fba439",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\vo\\PolicySourceVO.java"
+  },
+  {
+    "sha256": "31e6760e9d7858f692067ae249d10662bfd6987c6992bff2e89e511e3cf788e9",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\po\\package-info.java"
+  },
+  {
+    "sha256": "dc0fecc11aec4df1219f3ac06bee486e4a8dd4e69c19a5888f5cdc266fade58e",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\po\\OrderShipmentPO.java"
+  },
+  {
+    "sha256": "5fb8c60d9aec2e3b5e15d19e1eb6f3654f4b7891bed2bb920b1f979de7e99409",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\vo\\PolicySearchVO.java"
+  },
+  {
+    "sha256": "fa5e31c270d04bda5919180febcbbcf37e84ee835bd3dc93864d6e4a7cabf6d3",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\po\\OrderPO.java"
+  },
+  {
+    "sha256": "7b0f83a84aa60c00b944aa0bdcdd160cf2228377a35be7cecc2747949ffc4c14",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\vo\\package-info.java"
+  },
+  {
+    "sha256": "900f911c681e23afec9aba008cb3135063497ace101bbc8646da5f273cc6d259",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\order\\domain\\po\\OrderItemPO.java"
+  },
+  {
+    "sha256": "26bfb7b90f41f8f7268b3547bb77b5900271fb6cca15bc566dc481bfe5b06115",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\security\\TokenCodec.java"
+  },
+  {
+    "sha256": "c71a495e455b219c931b91717767a48dc0c968c453145707aacf9844a50211e0",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\security\\SecurityConfiguration.java"
+  },
+  {
+    "sha256": "8d2e5c011ee2e94f6c1c140e9e4ad5347c410daeaf2ea3035fa6c70c41c1de66",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\security\\PasswordConfiguration.java"
+  },
+  {
+    "sha256": "2c6662cf533ca49ac63fde7227076298212bd45814f647e7a4dad2a6147fc652",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\package-info.java"
+  },
+  {
+    "sha256": "8c8841bbef8cb0cc13eec319cc7904f81dbd40347821afe904937a2158bc2f4f",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\controller\\package-info.java"
+  },
+  {
+    "sha256": "b80472bbd8e27982b5a878b1e24d6fdfa545e6afd7eaadf6d966f506e28d4a4c",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\mapper\\PolicyMapper.java"
+  },
+  {
+    "sha256": "53eb08386e02266239ab3c1c1b403c337b82bd347ff3d0b3fff1959300b2d7ec",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\mapper\\package-info.java"
+  },
+  {
+    "sha256": "3d6c83fa80434d06dae6bca0cbe31f8e6eb44ff8d660432f4554b09fe9268cbd",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\AftersaleReason.java"
+  },
+  {
+    "sha256": "a0e6332c8963b501f1c886807e6acbd9162ec21b265e3e8d974019a58537c2c4",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\AftersaleStatus.java"
+  },
+  {
+    "sha256": "a66f407986b0655b61175549f29258b112edf4d83b181a451be77c47de39f739",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\AftersaleQuoteVO.java"
+  },
+  {
+    "sha256": "b58b5c21eb65d6243656a5158f0e87526d84314e144a7cd205de44f772b72009",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\AftersalePageVO.java"
+  },
+  {
+    "sha256": "575a275338725310a2d797fcb070d7870c405ae8579701f29746494a00cc6355",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\AftersaleVO.java"
+  },
+  {
+    "sha256": "740dea5eaa38e9e20900d4e2e6f4e220648c44a02ae5b6cb54c25b95c09caa29",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\DraftConfirmationVO.java"
+  },
+  {
+    "sha256": "f417d7aaabb0e2836182d01056c9f0380f3dae32b3ccbf128d3dcfc61d8a5afe",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\DraftVO.java"
+  },
+  {
+    "sha256": "09f2a4faddf4379d0ba4f363ae940e170293d17fd08e6caedd97f27f8430e835",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\package-info.java"
+  },
+  {
+    "sha256": "c11ca805d2b74d2c69d1b1e8d2ea76274ed302ef6a4a5ad794012016569efcb8",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\vo\\EligibilityVO.java"
+  },
+  {
+    "sha256": "b04683e504f28d980d3776e7aa306f84f867deaaa6a769b8472128b36273e87a",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\config\\DeepSeekGateway.java"
+  },
+  {
+    "sha256": "6400592fa74af8a3341ef49feca5c7e2116a8a9817b634aa74eb9728f84d0a83",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\mapper\\ConversationMapper.java"
+  },
+  {
+    "sha256": "b02d950d010b3312b958a7d2f5f820b1c4f773b91965f87e276ffba7cf0b3dc2",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\mapper\\package-info.java"
+  },
+  {
+    "sha256": "e35565c868407396199a2763066fdf5dc8d80c0e4db996b5d7ceb84dd1dc4b09",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\dto\\ReviewAftersaleDTO.java"
+  },
+  {
+    "sha256": "e390c54b0d5889ef291d698a9d84412be4215f57ba53a54eea2b9e60ac894448",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\dto\\package-info.java"
+  },
+  {
+    "sha256": "6f0756372291eaa3114593ce7adb57c010f92f6be83e250d95c4a6561b4716d8",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\dto\\DraftDTO.java"
+  },
+  {
+    "sha256": "e7ca8a38d05b61c9b27d61ce97efc7b36d40143f6f1416ffbfb2464558331429",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\dto\\CreateAftersaleDTO.java"
+  },
+  {
+    "sha256": "f8abe1580c972d066d8d3382ea5a4cd6dd4c0d4372019697f6179671f54e4016",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\dto\\ConfirmDraftDTO.java"
+  },
+  {
+    "sha256": "8b2ac52772ab1cadc32af3c62bf2b71bf1677664ae3a1480548d1f87c429d630",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\query\\PolicySearchQuery.java"
+  },
+  {
+    "sha256": "1d113d2ef216586160362bb5f2bada77a8d0c1346977553cd575f28e7c72f345",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\query\\package-info.java"
+  },
+  {
+    "sha256": "c44480c692d8b8198e89666dae2dead45049d31bffd62001789f124c63a7cc65",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\controller\\package-info.java"
+  },
+  {
+    "sha256": "2c9c1215fe1e9af877878d1644301720d7bd684ded9d7bcf991a91dc37580d3e",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\controller\\ConversationController.java"
+  },
+  {
+    "sha256": "0b08f451470812a746e343da4a06beaf060f56aeb83187ab1ce9924add4aadb2",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\mapper\\UserSessionMapper.java"
+  },
+  {
+    "sha256": "a8df160a849ebfd9da1abd30cb387669e5085ca7999d37638e918db32e531b33",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\mapper\\UserMapper.java"
+  },
+  {
+    "sha256": "e3f1cc264ae1c5ddae81230d6f091dbd65a651011edc4dde19835af93b92c0f0",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\mapper\\package-info.java"
+  },
+  {
+    "sha256": "c9e9a96421848a354cf4d50f2db83da98e1dd8bf4ae96ce33fd47b7728f40c94",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\common\\package-info.java"
+  },
+  {
+    "sha256": "4bd56b8064f37a0e599f7cf57cd56e35c90f3cc4dbe174a76b4f629fe3d51c16",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\dto\\PolicyDTO.java"
+  },
+  {
+    "sha256": "fde1edbd032ad161cd140ad52175209fc5164bd8c3967c2a5718e03ef0712834",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\dto\\package-info.java"
+  },
+  {
+    "sha256": "13e776cb7d342dff3b2302071c687e97be76eaee6f14dd49a923e60448b211b2",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\dto\\EditPolicyDTO.java"
+  },
+  {
+    "sha256": "b1efdb985aad5da9b1acffe2a6abdc98e95b4dadd3968441100afd586fc51d6e",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\controller\\UserController.java"
+  },
+  {
+    "sha256": "95212818117b2fae823a80da6863f55f428a1627622a34c97e168595f22e2701",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\controller\\SessionController.java"
+  },
+  {
+    "sha256": "00817983b6641d87b5dbc0a152a012f469dadaa28a9e8e73970f00a7caa4c353",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\controller\\package-info.java"
+  },
+  {
+    "sha256": "7e3a0be40c173ad9eafac4e87183bec62b4a637cf0b9b623e8f64485a8b26857",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\query\\package-info.java"
+  },
+  {
+    "sha256": "3f27b1554237861733a97b4ffe0701a9cb61b349b45b22dfce3301abbdfcdded",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\controller\\PolicyController.java"
+  },
+  {
+    "sha256": "10960d26f999eb07dbe4693207e5b6fbd9131aa77cc8323617a878948396d7f7",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\query\\AftersalePageQuery.java"
+  },
+  {
+    "sha256": "f20c9a593ea9eccb5c6fa44a546b4204222199b0c678b3f5c61cb26724812581",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\controller\\package-info.java"
+  },
+  {
+    "sha256": "d0f145edad43ccf0c61185504b75a63f02980d98f4c5935799494a4c1692bddb",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\domain\\vo\\RunVO.java"
+  },
+  {
+    "sha256": "ae6ee12175d62adae69e6d7eabb88ffd30ec47c9cce7077f70deca41f7afb3f1",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\domain\\vo\\package-info.java"
+  },
+  {
+    "sha256": "0e2b0a1cd932597c6cc103fd33c09a959830910632bebfd121f60b4d3faa101f",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\po\\package-info.java"
+  },
+  {
+    "sha256": "1144c5419df3ab0cae64bcb0f8e25ab86ec1454ad9d9aa934e3c3c1bbaccf6c4",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\po\\AftersalePO.java"
+  },
+  {
+    "sha256": "745ce2c4470f5826ab94132e28580e5ec4a9d3746ca5e8be840b6c04dd4d0a82",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\po\\AftersaleEventPO.java"
+  },
+  {
+    "sha256": "90b6221029b201a46aa620fabf280035934161437c403ac06ec3c3aaf28633af",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\aftersales\\domain\\po\\AftersaleDraftPO.java"
+  },
+  {
+    "sha256": "aa08905450b3342ef4f99693770861e4ffa04b5a559959cb8a5b1f864f355a99",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\po\\PolicyPO.java"
+  },
+  {
+    "sha256": "9caf4d4120bb2de4e037b6544fea0fc3ea70fc2b904dc938b35025f96d9def33",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\po\\PolicyChunkPO.java"
+  },
+  {
+    "sha256": "35e812d56d47d3f8b6bcbe30cef254534a549e21e5a595cbf6cedcdf7394bf76",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\knowledge\\domain\\po\\package-info.java"
+  },
+  {
+    "sha256": "c378be1edd3d63c3d5d8240c1fd6c8fe61055e024a9565ce41a5043341bf2491",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\cache\\SessionCache.java"
+  },
+  {
+    "sha256": "c44b1da086179f8a23dc84e9acce236aede344f10f32f9d36b48d735fbf34761",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\cache\\CachedSession.java"
+  },
+  {
+    "sha256": "31307d12e0a2942726ec4fd2116279fca417d6161de815b5170b96d54b98d38e",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\common\\handler\\ApiExceptionHandler.java"
+  },
+  {
+    "sha256": "e3c9a3e57ac0c024a901290c11ebf72d39592120ddb47724d6106547686ae3db",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\domain\\vo\\package-info.java"
+  },
+  {
+    "sha256": "ad27b1c90c0693b97c212791109c6b9c9a10a2dfb029908fb01b736ba4292142",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\domain\\vo\\MessageVO.java"
+  },
+  {
+    "sha256": "0e3885043f36a55f24d7ee0a25e92fe40ba2023da66a731c3f4aa09614026f0a",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\domain\\vo\\ConversationVO.java"
+  },
+  {
+    "sha256": "be36d6076d04ea0c1ae1e7dba92404668bd35ea4a0b6341b1b53bd4449474d1d",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\domain\\po\\RunPO.java"
+  },
+  {
+    "sha256": "dc96bcb14153042ea7073673bed6616fa28ccf4dd11042c75f753ba71ed7cec7",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\domain\\po\\package-info.java"
+  },
+  {
+    "sha256": "00163cd7115162862091da79a81aacc4c38fa122a14c930876885efed08aedc5",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\domain\\query\\package-info.java"
+  },
+  {
+    "sha256": "0df38a3bb793e2d0d373e880929949cfe4054c1b86940026248c14634244f97e",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\domain\\vo\\UserVO.java"
+  },
+  {
+    "sha256": "c04dde5640cd30ca5e83b7f1b486b8f09bc1a0a48bc8fd76c32ce33a23ebeba2",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\domain\\vo\\SessionVO.java"
+  },
+  {
+    "sha256": "0f098e1dfd015bde4017da1cf4b05040a2a94dd293592cc003f2ce5190b44a2b",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\domain\\vo\\package-info.java"
+  },
+  {
+    "sha256": "7336d6dd5e063f11206ddf35eee55759a657a757f8451c6c1abd626ec299857a",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\domain\\query\\package-info.java"
+  },
+  {
+    "sha256": "66bfdefb0fc9e5fc7cb9ba7d83aea6818ba9c7a5d0547851b6dd505544392a55",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\common\\config\\OpenApiConfiguration.java"
+  },
+  {
+    "sha256": "7a0cc60aee9398353709b5352aef2913b92252b18bfff873a8696ef1bc59c542",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\agent\\domain\\dto\\package-info.java"
+  },
+  {
+    "sha256": "b82d04c38b94b34a137a09e374d0d429af93b64a1ccfdd29ae71f6a715b80938",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\domain\\query\\package-info.java"
+  },
+  {
+    "sha256": "0c906dd4361e36b14778b188b80b83d45f649448edb7847fe8e14645e7f0e612",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\domain\\dto\\CreateSessionDTO.java"
+  },
+  {
+    "sha256": "1c1b535d7f0f9c1dcf5b2981f5a2835922080c0a42212b2aaaf499c523c4f7f3",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\domain\\dto\\package-info.java"
+  },
+  {
+    "sha256": "a68557b44d165a58d35d48fe40cd38e2feaa6c81d18a11d146f6f81877491b86",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\domain\\dto\\SendMessageDTO.java"
+  },
+  {
+    "sha256": "dbbd3c43d1b77d594fe299c9cbc5ac0e5b312708cd0cf30e204f42947bd3a416",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\domain\\dto\\package-info.java"
+  },
+  {
+    "sha256": "ac1fb1a6115465e4319f5181bd861d7278796c898c59ee04777ab3a6eccdfb3a",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\domain\\dto\\ConversationDTO.java"
+  },
+  {
+    "sha256": "30de3f49a391d600d2d17970b97d574ea38be31ba15159ca58222d0998920a0a",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\common\\filter\\RequestIdFilter.java"
+  },
+  {
+    "sha256": "154f846e3c26a1545ab8644a6d4feba59f7da748d050f94cc10b91daf3750fb2",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\domain\\po\\package-info.java"
+  },
+  {
+    "sha256": "8208c48ab2e2b82655f030aefefe7a876e6a3a7a69b9844c3f89b6b951dbf042",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\domain\\po\\UserSessionPO.java"
+  },
+  {
+    "sha256": "d10e0c00b9d799850ab8e91cf300a35a8b3ffb8303e0b33769e4317f08e89f20",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\identity\\domain\\po\\UserPO.java"
+  },
+  {
+    "sha256": "336660be5af9c4171ef83c30681c6e881ef5a57cefa82ac38f11e47aaa76c08d",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\common\\exception\\ContractNotImplementedException.java"
+  },
+  {
+    "sha256": "94d1b1649de9a7fb1d150f5076b2356e6581668766c3c1126e0666ae0923aceb",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\common\\exception\\ApiRequestException.java"
+  },
+  {
+    "sha256": "324e6173bf8c18cc50be1ef5bb0f2da38de90a22998d254c3fd6c2bc9d8304ba",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\domain\\po\\ConversationPO.java"
+  },
+  {
+    "sha256": "7d4ef252a9968c09b87220d2daadae68fe65c152853acf72f69ebdcf2ae04f5d",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\domain\\po\\package-info.java"
+  },
+  {
+    "sha256": "78888a6e5855d7bd740cade640c5154ad4b82cd00a7330be42057b57a2d800ca",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\conversation\\domain\\po\\MessagePO.java"
+  },
+  {
+    "sha256": "eaa2639d9ee741282ca89f0d898cece54a5ea881acea6a5f1046efcf1bdf063a",
+    "path": "backend/src/main\\java\\com\\example\\aftersales\\common\\domain\\vo\\ApiError.java"
+  }
+]

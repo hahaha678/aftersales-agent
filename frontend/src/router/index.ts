@@ -6,6 +6,16 @@ import { restoreSession } from '../services/auth'
 const router = createRouter({
     history: createWebHistory(),
     routes: [
+        {
+            path: '/knowledge',
+            component: () => import('../views/KnowledgeView.vue'),
+            meta: { title: '政策知识库', requiresAuth: true },
+        },
+        {
+            path: '/policies/:id',
+            component: () => import('../views/PolicyDetailView.vue'),
+            meta: { title: '政策原文', requiresAuth: true },
+        },
         { path: '/', component: OverviewView, meta: { title: '服务首页' } },
         { path: '/login', component: () => import('../views/LoginView.vue'), meta: { title: '登录' } },
         {

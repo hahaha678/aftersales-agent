@@ -17,6 +17,7 @@ const navigation = [
     { to: '/', label: '服务首页', symbol: '◫' },
     { to: '/orders', label: '我的订单', symbol: '▤' },
     { to: '/assistant', label: '智能售后', symbol: '✦' },
+    { to: '/knowledge', label: '政策知识库', symbol: '▧' },
     { to: '/aftersales', label: '售后记录', symbol: '↺' },
 ]
 async function signOut() {

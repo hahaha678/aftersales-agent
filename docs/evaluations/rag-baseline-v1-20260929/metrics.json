@@ -1,0 +1,15 @@
+{
+  "completedCases": 15,
+  "successfulTasks": 15,
+  "casesWithoutBusinessFailures": 15,
+  "expectedPolicyCases": 13,
+  "directExpectedHits": 9,
+  "agentExpectedHits": 6,
+  "casesCallingSearch": 8,
+  "casesWithSources": 6,
+  "toolCalls": 9,
+  "medianTurnMs": 1670,
+  "medianDirectRetrievalMs": 47,
+  "inputTokens": 47423.0,
+  "outputTokens": 2647.0
+}

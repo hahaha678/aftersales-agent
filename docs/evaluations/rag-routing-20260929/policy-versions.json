@@ -1,0 +1,67 @@
+[ {
+  "id" : "b9e54eb0-050b-492e-bd83-e442d90058e7",
+  "policyKey" : "demo-mouse-materials",
+  "version" : 2,
+  "title" : "演示政策：鼠标故障申请材料",
+  "scope" : "MOUSE",
+  "content" : "仅用于本项目演示，不代表真实商家承诺。鼠标按键故障申请材料新版本：需填写故障表现、发生频率和已尝试的排查步骤，新增需要准备购买凭证供人工核实。可准备故障视频；本项目不支持上传附件。材料齐全不代表审核自动通过，提交仍需订单资格检查和用户确认。",
+  "status" : "ARCHIVED",
+  "effectiveFrom" : "2026-09-28",
+  "effectiveUntil" : "2026-10-29",
+  "fingerprint" : "fcd65920be722a09922cb6999619c88da192c4833cb0b4d7444cae69935debb9"
+}, {
+  "id" : "7c54ccda-f775-4393-9336-9056c0959598",
+  "policyKey" : "demo-return-shipping",
+  "version" : 1,
+  "title" : "演示政策：退回商品前的准备",
+  "scope" : "GLOBAL",
+  "content" : "仅用于本项目演示，不代表真实商家承诺。\n提交申请后应等待审核，审核通过且收到人工确认的退回方式后再寄回。请核对商品和配件，并保留寄件凭证。\n此演示知识库没有退货地址和运费承担规则；助手不能虚构地址、承诺包邮或提供退款到账日期。",
+  "status" : "PUBLISHED",
+  "effectiveFrom" : "2026-09-28",
+  "effectiveUntil" : "2026-10-29",
+  "fingerprint" : "900a73828761a8c176db139c25311968f87559d4fd12593ed408a571a44d9cda"
+}, {
+  "id" : "3877eb9d-bbd4-4137-83b7-4a5f3ddd558f",
+  "policyKey" : "demo-logistics",
+  "version" : 1,
+  "title" : "演示政策：物流异常说明",
+  "scope" : "GLOBAL",
+  "content" : "仅用于本项目演示，不代表真实商家承诺。\n物流长时间未更新时，先核对物流工具返回的承运商、运单号和最新轨迹。若显示签收但未收到，请先核实家人或代收点，再联系承运商和商家人工客服。\n助手不得编造物流轨迹、承诺具体到货时间或自行承诺赔付。",
+  "status" : "PUBLISHED",
+  "effectiveFrom" : "2026-09-28",
+  "effectiveUntil" : "2026-10-29",
+  "fingerprint" : "8b589b5d49f8d9fbb742764119a42b4d323376dd35e3f9a52fa804604e0bb065"
+}, {
+  "id" : "4194f89c-8cdf-4a41-8fba-2bc280ffdf30",
+  "policyKey" : "demo-warranty",
+  "version" : 1,
+  "title" : "演示政策：鼠标保修咨询",
+  "scope" : "MOUSE",
+  "content" : "仅用于本项目演示，不代表真实商家承诺。\n超过本项目7天退货退款申请期限后，如有质量问题，应联系商家人工客服核实商品保修条件。此知识库没有统一保修年限或终身免费换新承诺。具体保修期限以购买时商品说明和厂家凭证为准，不能推测。",
+  "status" : "PUBLISHED",
+  "effectiveFrom" : "2026-09-28",
+  "effectiveUntil" : "2026-10-29",
+  "fingerprint" : "e4a329ea98f4f7307450ccd89ebf609f88074ec27d83c97443dfa69c92ddacf1"
+}, {
+  "id" : "adc52ec6-8ee8-4339-9555-10872ea80c89",
+  "policyKey" : "demo-mouse-materials",
+  "version" : 1,
+  "title" : "演示政策：鼠标故障申请材料",
+  "scope" : "MOUSE",
+  "content" : "仅用于本项目演示，不代表真实商家承诺。\n鼠标按键失灵、连击或连接异常时，请填写故障表现、出现频率和已尝试的排查步骤。可准备故障视频供人工审核参考；本项目当前不支持上传附件，请在描述中用文字说明。\n材料齐全不代表申请自动通过，是否能提交仍由订单资格判断。",
+  "status" : "ARCHIVED",
+  "effectiveFrom" : "2026-09-28",
+  "effectiveUntil" : "2026-10-29",
+  "fingerprint" : "f47c59a357313ea08da057bd71c665b2f7e3a2fbd426416c934f3ba575928360"
+}, {
+  "id" : "932ee510-01c4-4701-a55d-c08440c26595",
+  "policyKey" : "demo-return",
+  "version" : 1,
+  "title" : "演示政策：退货退款申请条件",
+  "scope" : "GLOBAL",
+  "content" : "仅用于本项目演示，不代表真实商家承诺。\n本项目退货退款要求订单已签收完成，申请时间在签收后7天内。是否符合资格、剩余可申请数量和金额，以订单售后资格工具及后端核价结果为准。\n用户在聊天中提出申请后，助手只能生成草稿。用户核对并点击确认才提交正式申请；审核通过表示待退货，不表示已经退款。",
+  "status" : "PUBLISHED",
+  "effectiveFrom" : "2026-09-28",
+  "effectiveUntil" : "2026-10-29",
+  "fingerprint" : "4e94b4831890ec3dece9e65bb371efe6e54b8d346d2bcc02edd113ca8d72fc16"
+} ]
