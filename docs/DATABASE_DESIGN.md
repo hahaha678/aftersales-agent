@@ -1,5 +1,7 @@
 # 用户与订单数据库设计 · 第一批
 
+V7 新增 `aftersale_refund` 记录模拟退款流水，扩展售后状态为 REFUND_PENDING、REFUND_FAILED、COMPLETED。退款请求键在单售后单内唯一，模拟渠道编号全局唯一；记录金额、前序失败请求键、场景、结果、操作者与时间。流水、售后状态和事件同事务写入。完成数量仍计入不可再申请数量，详见 [模拟退款](SIMULATED_REFUND.md)。
+
 后续已增加 V3 售后申请/记录表，以及 V4 会话、消息、Agent 任务、工具调用记录、售后草稿五张表。V4 用 UUID 标识会话/任务/草稿；消息采用 BIGINT 游标分页，任务以 (user_id, request_key) 唯一约束防止重复执行。草稿保存报价、版本、有效期和最终申请 ID，确认时重新核对业务规则。详见 [AGENT.md](AGENT.md)。
 
 本批对应六个用户、会话、订单接口，提供 MySQL 8.0.43 建表迁移和手动演示数据。六组 Mapper/PO、identity 认证 Service 与 order 查询 Service 已实现，见 PERSISTENCE.md、AUTHENTICATION.md、ORDER_QUERIES.md。开发验证使用隔离实例，没有连接或修改日常使用的 3306 数据库。
@@ -113,3 +115,7 @@ SOURCE deploy/mysql/02-seed-demo-data.sql;
 ## 后续开发顺序
 
 MyBatis、会话认证、注销及带归属限制的订单查询 Service 已完成。集成测试已覆盖跨用户访问、分页排序、金额序列化和空物流。下一步联调 Vue 页面，再开展售后模块。
+
+## 退回物流与收货扩展（V6）
+
+V6 在 aftersale_request 新增 return_carrier、return_tracking_number、return_registered_at、received_at、receipt_note，扩展状态及事件校验。RETURN_SHIPPED 和 RETURN_RECEIVED 仍占用数量与金额；用户只能登记本人申请，客服不能确认自己的退货。流程、接口与测试见 [退回物流说明](RETURN_SHIPMENT.md)。

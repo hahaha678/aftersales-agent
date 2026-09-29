@@ -40,7 +40,16 @@ class ApiContractTest {
         assertThat(response.statusCode()).isEqualTo(200);
         JsonNode document = mapper.readTree(response.body());
         var paths = document.path("paths");
-        assertThat(paths.size()).isEqualTo(32);
+        assertThat(paths.size()).isEqualTo(36);
+        assertThat(
+            paths.path("/api/staff/aftersales/{id}/refunds/{requestKey}").path("put").path("security").isArray()
+        ).isTrue();
+        assertThat(paths.path("/api/staff/aftersales/{id}/refunds/{requestKey}/reconciliation").has("post")).isTrue();
+        assertThat(
+            document.path("components").path("schemas").path("AftersaleVO").path("properties").has("refunds")
+        ).isTrue();
+        assertThat(paths.path("/api/aftersales/{id}/return-shipment").has("put")).isTrue();
+        assertThat(paths.path("/api/staff/aftersales/{id}/receipt").path("put").path("security").isArray()).isTrue();
         assertThat(paths.path("/api/knowledge/searches").path("post").path("security").isArray()).isTrue();
         assertThat(paths.path("/api/staff/policies/{id}/publication").has("post")).isTrue();
         assertThat(paths.path("/api/agent-runs/{id}/sources").has("get")).isTrue();

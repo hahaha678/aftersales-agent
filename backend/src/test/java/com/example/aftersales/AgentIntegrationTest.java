@@ -92,6 +92,7 @@ class AgentIntegrationTest {
             List<ToolCallback> tools = invocation.getArgument(2);
             Consumer<ModelGateway.Chunk> sink = invocation.getArgument(3);
             assertThat(tools.stream().map(t -> t.getToolDefinition().name())).containsExactly(
+                "searchPolicies",
                 "listMyOrders",
                 "getMyOrder",
                 "getMyShipments",
@@ -106,14 +107,21 @@ class AgentIntegrationTest {
             }
             if (message.equals("revoked")) tool(tools, "getMyOrder").call("{\"id\":\"" + order + "\"}");
             if (message.equals("fail")) throw new IllegalStateException("provider-secret-must-not-leak");
-            if (message.equals("draft")) {
+            if (message.equals("draft") || message.equals("draft-second")) {
+                long targetItem = message.equals("draft-second")
+                    ? jdbc.queryForObject(
+                          "SELECT id FROM order_item WHERE order_id=? AND sku_id=102",
+                          Long.class,
+                          order
+                      )
+                    : item;
                 String result = tool(tools, "createAftersaleDraft").call(
                     json.writeValueAsString(
                         Map.of(
                             "orderId",
                             "" + order,
                             "orderItemId",
-                            "" + item,
+                            "" + targetItem,
                             "quantity",
                             1,
                             "reason",
@@ -318,6 +326,39 @@ class AgentIntegrationTest {
             expect(call("GET", other, null, 1), 404);
         expect(call("GET", path, null, -1), 401);
         assertThat(await(send("history")).path("status").asString()).isEqualTo("SUCCEEDED");
+    }
+
+    @Test
+    void sameConversationKeepsFirstConfirmedAndSecondReadyDraft() throws Exception {
+        jdbc.update(
+            "INSERT INTO order_item(order_id,sku_id,product_name,quantity,paid_amount) VALUES(?,102,'第二件商品',2,70)",
+            order
+        );
+        jdbc.update("UPDATE trade_order SET paid_amount=80 WHERE id=?", order);
+        String first = draft();
+        expect(
+            call("POST", "/aftersale-drafts/" + first + "/confirmation", Map.of("version", 1, "confirmed", true), 0),
+            200
+        );
+        assertThat(await(send("draft-second")).path("status").asString()).isEqualTo("SUCCEEDED");
+        String second = draftId;
+        assertThat(second).isNotEqualTo(first);
+        var cards = expect(call("GET", "/conversations/" + conversation + "/drafts", null, 0), 200);
+        assertThat(cards.size()).isEqualTo(2);
+        assertThat(cards.get(0).path("id").asString()).isEqualTo(second);
+        assertThat(cards.get(0).path("status").asString()).isEqualTo("READY");
+        assertThat(cards.get(0).path("productName").asString()).isEqualTo("第二件商品");
+        assertThat(cards.get(1).path("id").asString()).isEqualTo(first);
+        assertThat(cards.get(1).path("status").asString()).isEqualTo("CONFIRMED");
+        expect(call("GET", "/conversations/" + conversation + "/drafts", null, 1), 404);
+        var confirmation = expect(
+            call("POST", "/aftersale-drafts/" + second + "/confirmation", Map.of("version", 1, "confirmed", true), 0),
+            200
+        );
+        assertThat(confirmation.path("confirmed").asBoolean()).isTrue();
+        assertThat(
+            jdbc.queryForObject("SELECT COUNT(*) FROM aftersale_request WHERE order_id=?", Integer.class, order)
+        ).isEqualTo(2);
     }
 
     @Test

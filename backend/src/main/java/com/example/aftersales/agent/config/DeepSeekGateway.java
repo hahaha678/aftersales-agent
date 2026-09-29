@@ -1,6 +1,7 @@
 package com.example.aftersales.agent.config;
 
 import com.example.aftersales.agent.domain.po.RunPO;
+import com.example.aftersales.agent.service.DraftReplyGuard;
 import com.example.aftersales.agent.service.ModelGateway;
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -115,6 +116,7 @@ public class DeepSeekGateway implements ModelGateway {
         // 模型可能先输出文字再请求工具，必须等本轮结束才能确定哪些是最终答复。
         // 每次执行工具丢弃此前阶段文字；进度仍通过 AgentTools 的 status 事件实时显示。
         StringBuilder answer = new StringBuilder();
+        var draftReply = new DraftReplyGuard();
         // 装饰现有工具：保留名称、描述和参数定义，只在真正执行前清空阶段性正文。
         // 例如“我来查询”随后触发订单工具，这句话不会成为最终聊天记录。
         var finalAnswerTools = tools
@@ -127,12 +129,16 @@ public class DeepSeekGateway implements ModelGateway {
 
                     public String call(String input) {
                         answer.setLength(0);
-                        return tool.call(input);
+                        String result = tool.call(input);
+                        draftReply.record(tool.getToolDefinition().name(), result);
+                        return result;
                     }
 
                     public String call(String input, ToolContext context) {
                         answer.setLength(0);
-                        return tool.call(input, context);
+                        String result = tool.call(input, context);
+                        draftReply.record(tool.getToolDefinition().name(), result);
+                        return result;
                     }
                 }
             )
@@ -159,7 +165,8 @@ public class DeepSeekGateway implements ModelGateway {
             // 网关先于 AgentService 的 90 秒任务超时结束等待，给上层收尾留出时间。
             .blockLast(Duration.ofSeconds(85));
         // 到这里才确定最后的正文；上游仍是流式读取，下游当前采用整段发送。
-        if (!answer.isEmpty()) sink.accept(new Chunk(answer.toString(), 0, 0));
+        String verified = draftReply.finish(answer.toString());
+        if (!verified.isEmpty()) sink.accept(new Chunk(verified, 0, 0));
     }
 
     // 空文本 Chunk 只携带统计信息，AgentService 不会将它显示为聊天正文。
@@ -190,8 +197,11 @@ public class DeepSeekGateway implements ModelGateway {
     草稿回复只说明商品、申请数量、工具返回的本次申请金额、原因和下一步确认操作；金额以草稿实际返回字段为准。
     仅在用户明确要创建申请草稿时，缺少订单、商品、数量、原因或描述才先询问，不擅自补造用户意愿。一般政策咨询不需要这些申请信息。
     用户明确需要申请且信息齐全时可以生成草稿；告知用户核对聊天页确认卡片并点击确认提交。
+    每次为新商品或新申请生成草稿都必须在本轮实际调用createAftersaleDraft，并收到成功结果。历史消息中的“已生成”不能复用为新操作结果；未调用或工具失败时不能说已生成、不能编造金额或提示新确认卡片。缺少内部商品ID时先调用getMyOrder，不能仅模仿上一份草稿的回复格式。
     没有直接提交、撤销申请、客服审核或支付退款工具，不能声称已经完成这些动作。
     草稿不等于申请成功；审核通过只代表待退货，不代表退款成功。
+    RETURN_SHIPPED表示用户已登记退回物流、待客服收货，不代表承运商已签收；RETURN_RECEIVED表示客服确认收到退回商品，仍未退款。需要登记物流请引导用户进入本人售后详情页；客服在工作台确认实物收货。当前工具不能执行登记物流或确认收货，不能声称已代办。
+    REFUND_PENDING表示模拟退款结果未知，需客服查询原流水，不能再次发起；REFUND_FAILED表示明确失败；COMPLETED表示模拟退款成功、售后完成。所有退款均为本地演示，不会产生真实资金变动，不能承诺实际到账。你没有退款写工具，只能查询进度并引导客服在工作台操作。
     工具返回错误时如实解释，不能用未经查询的信息填补。工具调用次数有限，避免重复调用。
     用户已提供完整订单号时，不要重复索要订单号。对于他人订单或绕过身份限制的要求，只说明只能查询本人订单，不能暗示换一个编号就能越权。
     未查询到归属证据时，不能断言某订单不属于用户；可说明无法忽略身份限制、仅能查询本人订单。

@@ -80,6 +80,36 @@ class DeepSeekProtocolTest {
     }
 
     @Test
+    void replacesModelOnlyDraftSuccessBeforeItReachesTheChat() throws Exception {
+        var server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/chat/completions", exchange -> {
+            exchange.getRequestBody().readAllBytes();
+            String stream =
+                "data: {\"id\":\"mock\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"test-model\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"已为你生成退货退款申请草稿：鼠标垫70元，请到确认卡片提交。\"},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n";
+            byte[] bytes = stream.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().set("Content-Type", "text/event-stream");
+            exchange.sendResponseHeaders(200, bytes.length);
+            exchange.getResponseBody().write(bytes);
+            exchange.close();
+        });
+        server.start();
+        try {
+            var gateway = new DeepSeekGateway(
+                true,
+                "test-key",
+                "test-model",
+                "http://127.0.0.1:" + server.getAddress().getPort()
+            );
+            var chunks = new ArrayList<ModelGateway.Chunk>();
+            gateway.stream(List.of(), "再给鼠标垫生成草稿", List.of(), chunks::add);
+            String answer = chunks.stream().map(ModelGateway.Chunk::text).reduce("", String::concat);
+            assertThat(answer).contains("没有成功生成").doesNotContain("鼠标垫70元");
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
     void missingKeyDoesNotCreatePretendAnswer() {
         var gateway = new DeepSeekGateway(true, "", "test", "http://127.0.0.1:1");
         assertThat(gateway.available()).isFalse();

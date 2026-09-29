@@ -101,6 +101,24 @@ public class AftersaleController {
         return service().cancel(id);
     }
 
+    @PutMapping(value = "/aftersales/{id}/return-shipment", consumes = "application/json")
+    @Operation(
+        summary = "登记本人申请的退回物流",
+        description = "仅 APPROVED 可首次登记，转为 RETURN_SHIPPED。相同承运商和单号重试返回原结果（包括已收货后），不同内容返回 409；不会验证真实快递轨迹。"
+    )
+    public AftersaleVO registerReturn(@PathVariable String id, @Valid @RequestBody RegisterReturnShipmentDTO body) {
+        return service().registerReturn(id, body);
+    }
+
+    @PutMapping(value = "/staff/aftersales/{id}/receipt", consumes = "application/json")
+    @Operation(
+        summary = "客服确认退回商品已收货",
+        description = "仅 RETURN_SHIPPED 可确认，转为 RETURN_RECEIVED；不能确认自己的申请。同一收货备注重试不重复写记录，其他内容返回 409。不执行退款。"
+    )
+    public AftersaleVO confirmReceipt(@PathVariable String id, @Valid @RequestBody ConfirmReceiptDTO body) {
+        return service().confirmReceipt(id, body);
+    }
+
     @GetMapping("/staff/aftersales")
     @Operation(summary = "客服分页查询售后申请", description = "跨用户查询，仅 STAFF 可访问。")
     public AftersalePageVO staffList(@Valid @ModelAttribute @ParameterObject AftersalePageQuery query) {

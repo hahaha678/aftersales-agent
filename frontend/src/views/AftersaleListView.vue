@@ -56,8 +56,10 @@ onBeforeUnmount(() => {
 <template>
     <section class="page-heading">
         <p class="eyebrow">AFTERCARE PROGRESS</p>
-        <h1>{{ staff ? '售后审核工作台' : '我的售后记录' }}</h1>
-        <p>{{ staff ? '查看申请详情并作出审核决定。' : '查看申请状态与处理记录，待审核申请可以撤销。' }}</p>
+        <h1>{{ staff ? '售后处理工作台' : '我的售后记录' }}</h1>
+        <p>
+            {{ staff ? '审核申请、核对退回物流并确认实物收货。' : '查看申请进度，审核通过并实际寄出后登记退回物流。' }}
+        </p>
     </section>
     <form class="filter-panel" @submit.prevent="search">
         <div>

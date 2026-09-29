@@ -628,6 +628,20 @@ button:focus-visible {
     display: flex;
     flex-direction: column;
 }
+/* 桌面菜单停留在视口内；矮窗口下菜单自身可滚动，避免底部入口被遮住。 */
+@media (min-width: 721px) {
+    .sidebar {
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        height: 100vh;
+        height: 100dvh;
+        overflow-y: auto;
+    }
+    .sidebar > * {
+        flex-shrink: 0;
+    }
+}
 .brand {
     display: flex;
     align-items: center;

@@ -96,6 +96,10 @@ class AftersaleIntegrationTest {
     void cleanup() {
         for (long uid : users) {
             jdbc.update(
+                "DELETE r FROM aftersale_refund r JOIN aftersale_request a ON a.id=r.request_id WHERE a.user_id=?",
+                uid
+            );
+            jdbc.update(
                 "DELETE e FROM aftersale_event e JOIN aftersale_request a ON a.id=e.request_id WHERE a.user_id=?",
                 uid
             );
@@ -161,6 +165,419 @@ class AftersaleIntegrationTest {
             .get(0)
             .path("availableQuantity")
             .asInt();
+    }
+
+    void approve(String id) throws Exception {
+        expect(
+            call("POST", "/staff/aftersales/" + id + "/review", Map.of("decision", "APPROVED", "note", "同意退回"), 2),
+            200
+        );
+    }
+
+    void receive(String id) throws Exception {
+        approve(id);
+        expect(
+            call(
+                "PUT",
+                "/aftersales/" + id + "/return-shipment",
+                Map.of("carrier", "顺丰速运", "trackingNumber", "SF1234567890"),
+                0
+            ),
+            200
+        );
+        expect(call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "实物已核对"), 2), 200);
+    }
+
+    String refundPath(String id, String key) {
+        return "/staff/aftersales/" + id + "/refunds/" + key;
+    }
+
+    @Test
+    void successfulRefundIsIdempotentAndCompletedQuantityCannotBeReused() throws Exception {
+        String id = create(3),
+            key = UUID.randomUUID().toString();
+        receive(id);
+        var body = Map.of("mode", "SUCCESS");
+        var completed = expect(call("PUT", refundPath(id, key), body, 2), 200);
+        assertThat(completed.path("status").asString()).isEqualTo("COMPLETED");
+        var refund = completed.path("refunds").get(0);
+        assertThat(refund.path("amount").asString()).isEqualTo("10.00");
+        assertThat(refund.path("operationNumber").asString()).startsWith("SIM-");
+        assertThat(refund.path("status").asString()).isEqualTo("SUCCEEDED");
+        assertThat(refund.path("updatedAt").asString()).endsWith("Z");
+        for (int i = 0; i < 2; i++) {
+            var again = expect(call("PUT", refundPath(id, key), body, 2), 200);
+            assertThat(again.path("refunds").size()).isEqualTo(1);
+            assertThat(again.path("events").size()).isEqualTo(5);
+        }
+        expect(call("PUT", refundPath(id, key), Map.of("mode", "FAILURE"), 2), 409);
+        expect(call("PUT", refundPath(id, UUID.randomUUID().toString()), body, 2), 409);
+        expect(call("POST", refundPath(id, key) + "/reconciliation", null, 2), 200);
+        expect(call("POST", "/aftersales/" + id + "/cancellation", null, 0), 409);
+        expect(call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "实物已核对"), 2), 200);
+        expect(call("POST", "/aftersales", body(order, item, 1, UUID.randomUUID().toString()), 0), 409);
+        assertThat(available()).isZero();
+        var eligibility = expect(call("GET", "/orders/" + order + "/aftersale-eligibility", null, 0), 200);
+        assertThat(eligibility.path("items").get(0).path("remainingAmount").asString()).isEqualTo("0.00");
+        assertThat(
+            expect(call("GET", "/staff/aftersales?status=COMPLETED", null, 2), 200)
+                .path("total")
+                .asInt()
+        ).isEqualTo(1);
+        expect(call("GET", "/aftersales/" + id, null, 1), 404);
+    }
+
+    @Test
+    void timeoutMustBeReconciledBeforeRetryAndBothOutcomesArePersisted() throws Exception {
+        for (String mode : List.of("TIMEOUT_SUCCESS", "TIMEOUT_FAILURE")) {
+            String id = create(1),
+                key = UUID.randomUUID().toString();
+            receive(id);
+            var pending = expect(call("PUT", refundPath(id, key), Map.of("mode", mode), 2), 200);
+            assertThat(pending.path("status").asString()).isEqualTo("REFUND_PENDING");
+            assertThat(pending.path("refunds").get(0).path("status").asString()).isEqualTo("UNKNOWN");
+            expect(
+                call(
+                    "PUT",
+                    refundPath(id, UUID.randomUUID().toString()),
+                    Map.of("mode", "SUCCESS", "previousKey", key),
+                    2
+                ),
+                409
+            );
+            // 普通详情查询不偷偷推进退款。
+            assertThat(
+                expect(call("GET", "/aftersales/" + id, null, 0), 200)
+                    .path("status")
+                    .asString()
+            ).isEqualTo("REFUND_PENDING");
+            String target = mode.equals("TIMEOUT_SUCCESS") ? "COMPLETED" : "REFUND_FAILED";
+            for (int i = 0; i < 2; i++) {
+                var result = expect(call("POST", refundPath(id, key) + "/reconciliation", null, 2), 200);
+                assertThat(result.path("status").asString()).isEqualTo(target);
+                assertThat(result.path("events").size()).isEqualTo(6);
+                assertThat(result.path("refunds").size()).isEqualTo(1);
+            }
+            if (target.equals("REFUND_FAILED")) {
+                var result = expect(
+                    call(
+                        "PUT",
+                        refundPath(id, UUID.randomUUID().toString()),
+                        Map.of("mode", "SUCCESS", "previousKey", key),
+                        2
+                    ),
+                    200
+                );
+                assertThat(result.path("status").asString()).isEqualTo("COMPLETED");
+                assertThat(result.path("refunds").size()).isEqualTo(2);
+                // 旧失败流水的晚到请求只返回现有状态，不能再发起退款。
+                assertThat(
+                    expect(call("PUT", refundPath(id, key), Map.of("mode", mode), 2), 200)
+                        .path("refunds")
+                        .size()
+                ).isEqualTo(2);
+            }
+        }
+        assertThat(available()).isEqualTo(1);
+    }
+
+    @Test
+    void concurrentFailedRetriesRequireTheLatestFailedAttempt() throws Exception {
+        String id = create(1),
+            key = UUID.randomUUID().toString();
+        receive(id);
+        expect(call("PUT", refundPath(id, key), Map.of("mode", "FAILURE"), 2), 200);
+        expect(call("PUT", refundPath(id, UUID.randomUUID().toString()), Map.of("mode", "SUCCESS"), 2), 409);
+        try (var pool = Executors.newFixedThreadPool(2)) {
+            var gate = new CountDownLatch(1);
+            Callable<Integer> retry = () -> {
+                gate.await();
+                return call(
+                    "PUT",
+                    refundPath(id, UUID.randomUUID().toString()),
+                    Map.of("mode", "FAILURE", "previousKey", key),
+                    2
+                ).statusCode();
+            };
+            var first = pool.submit(retry);
+            var second = pool.submit(retry);
+            gate.countDown();
+            assertThat(
+                List.of(first.get(15, TimeUnit.SECONDS), second.get(15, TimeUnit.SECONDS))
+            ).containsExactlyInAnyOrder(200, 409);
+        }
+        var detail = expect(call("GET", "/aftersales/" + id, null, 0), 200);
+        assertThat(detail.path("refunds").size()).isEqualTo(2);
+        assertThat(detail.path("status").asString()).isEqualTo("REFUND_FAILED");
+        assertThat(available()).isEqualTo(2);
+        String previous = detail.path("refunds").get(0).path("requestKey").asString();
+        String successKey = UUID.randomUUID().toString();
+        try (var pool = Executors.newFixedThreadPool(2)) {
+            var gate = new CountDownLatch(1);
+            Callable<Integer> submit = () -> {
+                gate.await();
+                return call(
+                    "PUT",
+                    refundPath(id, successKey),
+                    Map.of("mode", "SUCCESS", "previousKey", previous),
+                    2
+                ).statusCode();
+            };
+            var first = pool.submit(submit);
+            var second = pool.submit(submit);
+            gate.countDown();
+            assertThat(List.of(first.get(15, TimeUnit.SECONDS), second.get(15, TimeUnit.SECONDS))).containsExactly(
+                200,
+                200
+            );
+        }
+        assertThat(
+            jdbc.queryForObject(
+                "SELECT COUNT(*) FROM aftersale_refund WHERE request_id=? AND status='SUCCEEDED'",
+                Integer.class,
+                Long.parseLong(id)
+            )
+        ).isEqualTo(1);
+    }
+
+    @Test
+    void refundPermissionsStatesAndValidationCannotBeBypassed() throws Exception {
+        String id = create(1),
+            key = UUID.randomUUID().toString();
+        String path = refundPath(id, key);
+        var body = Map.of("mode", "SUCCESS");
+        expect(call("PUT", path, body, -1), 401);
+        expect(call("PUT", path, body, 0), 403);
+        expect(call("POST", path + "/reconciliation", null, 0), 403);
+        expect(call("PUT", path, body, 2), 409);
+        expect(call("PUT", path, Map.of("mode", "INVALID"), 2), 400);
+        expect(call("PUT", path, Map.of(), 2), 400);
+        expect(call("PUT", refundPath(id, "bad"), body, 2), 400);
+        receive(id);
+        expect(call("POST", path + "/reconciliation", null, 2), 404);
+        String own = expect(
+            call("POST", "/aftersales", body(staffOrder, staffItem, 1, UUID.randomUUID().toString()), 2),
+            201
+        )
+            .path("id")
+            .asString();
+        expect(call("PUT", refundPath(own, key), body, 2), 403);
+        expect(call("POST", refundPath(own, key) + "/reconciliation", null, 2), 403);
+    }
+
+    @Test
+    void partialRefundsSettleRoundingAndNeverExceedPaidAmount() throws Exception {
+        String first = create(1);
+        receive(first);
+        expect(call("PUT", refundPath(first, UUID.randomUUID().toString()), Map.of("mode", "SUCCESS"), 2), 200);
+        String second = create(2);
+        receive(second);
+        var completed = expect(
+            call("PUT", refundPath(second, UUID.randomUUID().toString()), Map.of("mode", "SUCCESS"), 2),
+            200
+        );
+        assertThat(completed.path("refunds").get(0).path("amount").asString()).isEqualTo("6.67");
+        assertThat(
+            jdbc.queryForObject(
+                "SELECT SUM(r.amount) FROM aftersale_refund r JOIN aftersale_request a ON a.id=r.request_id WHERE a.order_id=? AND r.status='SUCCEEDED'",
+                java.math.BigDecimal.class,
+                order
+            )
+        ).isEqualByComparingTo("10.00");
+        assertThat(available()).isZero();
+    }
+
+    @Test
+    void returnShipmentAndReceiptAreIdempotentAndKeepReservation() throws Exception {
+        String id = create(3);
+        var shipment = Map.of("carrier", "顺丰速运", "trackingNumber", "SF1234567890");
+        expect(call("PUT", "/aftersales/" + id + "/return-shipment", shipment, 0), 409);
+        expect(call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "收货"), 2), 409);
+        approve(id);
+        expect(call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "收货"), 2), 409);
+        var registered = expect(call("PUT", "/aftersales/" + id + "/return-shipment", shipment, 0), 200);
+        assertThat(registered.path("status").asString()).isEqualTo("RETURN_SHIPPED");
+        assertThat(registered.path("returnShipment").path("carrier").asString()).isEqualTo("顺丰速运");
+        assertThat(registered.path("returnShipment").path("registeredAt").asString()).endsWith("Z");
+        assertThat(registered.path("receipt").isNull()).isTrue();
+        assertThat(
+            expect(call("PUT", "/aftersales/" + id + "/return-shipment", shipment, 0), 200)
+                .path("events")
+                .size()
+        ).isEqualTo(3);
+        expect(
+            call(
+                "PUT",
+                "/aftersales/" + id + "/return-shipment",
+                Map.of("carrier", "顺丰速运", "trackingNumber", "SF9999999999"),
+                0
+            ),
+            409
+        );
+        assertThat(available()).isZero();
+        var received = expect(
+            call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "商品数量和配件已核对"), 2),
+            200
+        );
+        assertThat(received.path("status").asString()).isEqualTo("RETURN_RECEIVED");
+        assertThat(received.path("receipt").path("receivedAt").asString()).endsWith("Z");
+        assertThat(received.path("receipt").path("note").asString()).isEqualTo("商品数量和配件已核对");
+        assertThat(
+            expect(call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "商品数量和配件已核对"), 2), 200)
+                .path("events")
+                .size()
+        ).isEqualTo(4);
+        expect(call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "不同备注"), 2), 409);
+        assertThat(
+            expect(call("PUT", "/aftersales/" + id + "/return-shipment", shipment, 0), 200)
+                .path("status")
+                .asString()
+        ).isEqualTo("RETURN_RECEIVED");
+        expect(call("POST", "/aftersales/" + id + "/cancellation", null, 0), 409);
+        expect(call("POST", "/aftersales", body(order, item, 1, UUID.randomUUID().toString()), 0), 409);
+        assertThat(available()).isZero();
+        var eligibility = expect(call("GET", "/orders/" + order + "/aftersale-eligibility", null, 0), 200);
+        assertThat(eligibility.path("items").get(0).path("remainingAmount").asString()).isEqualTo("0.00");
+        assertThat(
+            expect(call("GET", "/orders/" + order, null, 0), 200)
+                .path("items")
+                .get(0)
+                .path("availableAftersalesQuantity")
+                .asInt()
+        ).isZero();
+        assertThat(
+            expect(call("GET", "/staff/aftersales?status=RETURN_RECEIVED", null, 2), 200)
+                .path("total")
+                .asInt()
+        ).isEqualTo(1);
+        assertThat(
+            jdbc.queryForObject(
+                "SELECT actor_id FROM aftersale_event WHERE request_id=? AND action='RETURN_RECEIVED'",
+                Long.class,
+                Long.parseLong(id)
+            )
+        ).isEqualTo(users.get(2));
+    }
+
+    @Test
+    void returnPermissionsAndInputValidation() throws Exception {
+        String id = create(1);
+        approve(id);
+        var shipment = Map.of("carrier", "顺丰速运", "trackingNumber", "SF1234567890");
+        expect(call("PUT", "/aftersales/" + id + "/return-shipment", shipment, -1), 401);
+        expect(call("PUT", "/aftersales/" + id + "/return-shipment", shipment, 1), 404);
+        expect(call("PUT", "/aftersales/" + id + "/return-shipment", shipment, 2), 404);
+        expect(call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "已收货"), 0), 403);
+        for (var invalid : List.of(
+            Map.of("carrier", " ", "trackingNumber", "SF1234567890"),
+            Map.of("carrier", "顺丰速运", "trackingNumber", "abc"),
+            Map.of("carrier", "顺丰速运", "trackingNumber", "https://evil.test")
+        ))
+            expect(call("PUT", "/aftersales/" + id + "/return-shipment", invalid, 0), 400);
+        expect(call("PUT", "/aftersales/" + id + "/return-shipment", shipment, 0), 200);
+        expect(call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "   "), 2), 400);
+        expect(call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "字".repeat(1001)), 2), 400);
+        assertThat(
+            expect(call("GET", "/aftersales/" + id, null, 0), 200)
+                .path("status")
+                .asString()
+        ).isEqualTo("RETURN_SHIPPED");
+        expect(call("GET", "/aftersales/" + id, null, 1), 404);
+        // 设置自有申请的已审核测试夹具，避免通过审核接口绕过既有自审限制。
+        String own = expect(
+            call("POST", "/aftersales", body(staffOrder, staffItem, 1, UUID.randomUUID().toString()), 2),
+            201
+        )
+            .path("id")
+            .asString();
+        jdbc.update("UPDATE aftersale_request SET status='APPROVED' WHERE id=?", Long.parseLong(own));
+        expect(call("PUT", "/aftersales/" + own + "/return-shipment", shipment, 2), 200);
+        expect(call("PUT", "/staff/aftersales/" + own + "/receipt", Map.of("note", "自己收货"), 2), 403);
+    }
+
+    @Test
+    void concurrentReturnChangesHaveOneWinnerAndReceiptRetryCreatesOneEvent() throws Exception {
+        String id = create(1);
+        approve(id);
+        try (var pool = Executors.newFixedThreadPool(2)) {
+            var gate = new CountDownLatch(1);
+            var first = pool.submit(() -> {
+                gate.await();
+                return call(
+                    "PUT",
+                    "/aftersales/" + id + "/return-shipment",
+                    Map.of("carrier", "顺丰速运", "trackingNumber", "SF11111111"),
+                    0
+                ).statusCode();
+            });
+            var second = pool.submit(() -> {
+                gate.await();
+                return call(
+                    "PUT",
+                    "/aftersales/" + id + "/return-shipment",
+                    Map.of("carrier", "顺丰速运", "trackingNumber", "SF22222222"),
+                    0
+                ).statusCode();
+            });
+            gate.countDown();
+            assertThat(
+                List.of(first.get(15, TimeUnit.SECONDS), second.get(15, TimeUnit.SECONDS))
+            ).containsExactlyInAnyOrder(200, 409);
+        }
+        try (var pool = Executors.newFixedThreadPool(2)) {
+            var gate = new CountDownLatch(1);
+            Callable<Integer> receipt = () -> {
+                gate.await();
+                return call(
+                    "PUT",
+                    "/staff/aftersales/" + id + "/receipt",
+                    Map.of("note", "核对实物已收货"),
+                    2
+                ).statusCode();
+            };
+            var first = pool.submit(receipt);
+            var second = pool.submit(receipt);
+            gate.countDown();
+            assertThat(List.of(first.get(15, TimeUnit.SECONDS), second.get(15, TimeUnit.SECONDS))).containsExactly(
+                200,
+                200
+            );
+        }
+        assertThat(
+            expect(call("GET", "/aftersales/" + id, null, 0), 200)
+                .path("events")
+                .size()
+        ).isEqualTo(4);
+        assertThat(available()).isEqualTo(2);
+    }
+
+    @Test
+    void cancelledAndRejectedRequestsCannotRegisterReturns() throws Exception {
+        String cancelled = create(1),
+            rejected = create(1);
+        expect(call("POST", "/aftersales/" + cancelled + "/cancellation", null, 0), 200);
+        expect(
+            call(
+                "POST",
+                "/staff/aftersales/" + rejected + "/review",
+                Map.of("decision", "REJECTED", "note", "拒绝申请"),
+                2
+            ),
+            200
+        );
+        for (String id : List.of(cancelled, rejected)) {
+            expect(
+                call(
+                    "PUT",
+                    "/aftersales/" + id + "/return-shipment",
+                    Map.of("carrier", "顺丰速运", "trackingNumber", "SF1234567890"),
+                    0
+                ),
+                409
+            );
+            expect(call("PUT", "/staff/aftersales/" + id + "/receipt", Map.of("note", "收货"), 2), 409);
+        }
+        assertThat(available()).isEqualTo(3);
     }
 
     @Test

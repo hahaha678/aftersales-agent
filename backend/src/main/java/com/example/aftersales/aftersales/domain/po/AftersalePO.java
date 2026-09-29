@@ -5,6 +5,52 @@ import java.time.LocalDateTime;
 
 public class AftersalePO {
 
+    private String returnCarrier;
+    private String returnTrackingNumber;
+    private LocalDateTime returnRegisteredAt;
+    private LocalDateTime receivedAt;
+    private String receiptNote;
+
+    public String getReturnCarrier() {
+        return returnCarrier;
+    }
+
+    public void setReturnCarrier(String value) {
+        returnCarrier = value;
+    }
+
+    public String getReturnTrackingNumber() {
+        return returnTrackingNumber;
+    }
+
+    public void setReturnTrackingNumber(String value) {
+        returnTrackingNumber = value;
+    }
+
+    public LocalDateTime getReturnRegisteredAt() {
+        return returnRegisteredAt;
+    }
+
+    public void setReturnRegisteredAt(LocalDateTime value) {
+        returnRegisteredAt = value;
+    }
+
+    public LocalDateTime getReceivedAt() {
+        return receivedAt;
+    }
+
+    public void setReceivedAt(LocalDateTime value) {
+        receivedAt = value;
+    }
+
+    public String getReceiptNote() {
+        return receiptNote;
+    }
+
+    public void setReceiptNote(String value) {
+        receiptNote = value;
+    }
+
     private Long id;
 
     public Long getId() {

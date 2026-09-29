@@ -5,6 +5,7 @@ import com.example.aftersales.aftersales.domain.po.AftersalePO;
 import com.example.aftersales.aftersales.domain.query.AftersalePageQuery;
 import com.example.aftersales.aftersales.domain.vo.*;
 import com.example.aftersales.aftersales.mapper.AftersaleMapper;
+import com.example.aftersales.aftersales.mapper.RefundMapper;
 import com.example.aftersales.common.exception.ApiRequestException;
 import com.example.aftersales.identity.service.CurrentUserService;
 import com.example.aftersales.order.domain.OrderStatus;
@@ -27,17 +28,20 @@ public class AftersaleService {
     private final AftersaleMapper requests;
     private final OrderMapper orders;
     private final OrderItemMapper items;
+    private final RefundMapper refunds;
 
     public AftersaleService(
         CurrentUserService user,
         AftersaleMapper requests,
         OrderMapper orders,
-        OrderItemMapper items
+        OrderItemMapper items,
+        RefundMapper refunds
     ) {
         this.user = user;
         this.requests = requests;
         this.orders = orders;
         this.items = items;
+        this.refunds = refunds;
     }
 
     public EligibilityVO eligibility(String orderId) {
@@ -205,6 +209,49 @@ public class AftersaleService {
         return view(requests.find(row.getId()), true);
     }
 
+    /** 单申请只有一份退回物流；相同内容可重试，已登记内容不可覆盖。 */
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public AftersaleVO registerReturn(String requestId, RegisterReturnShipmentDTO body) {
+        long uid = user.requireUserId();
+        var row = locked(id(requestId), uid, false);
+        if (row.getReturnRegisteredAt() != null) {
+            if (
+                Objects.equals(row.getReturnCarrier(), body.carrier()) &&
+                Objects.equals(row.getReturnTrackingNumber(), body.trackingNumber())
+            ) return view(row, true);
+            throw conflict("退回物流已登记，不能覆盖原记录；请联系人工客服核实");
+        }
+        if (
+            !row.getStatus().equals("APPROVED") ||
+            requests.registerReturn(row.getId(), body.carrier(), body.trackingNumber()) != 1
+        ) throw conflict("仅审核通过、待退货的申请可以登记退回物流，请刷新详情");
+        requests.event(
+            row.getId(),
+            uid,
+            "RETURN_SHIPPED",
+            "用户登记退回物流：" + body.carrier() + "，单号 " + body.trackingNumber()
+        );
+        return view(requests.find(row.getId()), true);
+    }
+
+    /** 人工确认实物收货；不自动触发退款、不释放申请数量或金额。 */
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public AftersaleVO confirmReceipt(String requestId, ConfirmReceiptDTO body) {
+        long uid = user.requireUserId();
+        user.requireStaff();
+        var row = locked(id(requestId), uid, true);
+        if (row.getUserId() == uid) throw new ApiRequestException(403, "FORBIDDEN", "不能确认自己的退货收货");
+        if (row.getReceivedAt() != null) {
+            if (Objects.equals(row.getReceiptNote(), body.note())) return view(row, true);
+            throw conflict("已确认收货，不能覆盖收货记录");
+        }
+        if (
+            !row.getStatus().equals("RETURN_SHIPPED") || requests.receiveReturn(row.getId(), body.note()) != 1
+        ) throw conflict("仅已登记退回物流的申请可以确认收货，请刷新详情");
+        requests.event(row.getId(), uid, "RETURN_RECEIVED", body.note());
+        return view(requests.find(row.getId()), true);
+    }
+
     private void transition(AftersalePO row, String target, long actor, String note) {
         if (!row.getStatus().equals("PENDING") || requests.transition(row.getId(), target) != 1) throw conflict(
             "申请已被处理，无法执行此操作，请刷新详情"
@@ -247,7 +294,7 @@ public class AftersaleService {
         if (now.isBefore(order.getSignedAt())) return "签收时间尚未到达，请核对订单";
         if (!now.isBefore(deadline(order))) return "已超过签收后 7 天的申请期限";
         if (item.getPaidAmount().signum() <= 0) return "零实付商品暂不支持退货退款";
-        if (available <= 0) return "商品数量已被其他待审核或已通过申请占用";
+        if (available <= 0) return "商品数量已被其他售后申请占用";
         return null;
     }
 
@@ -276,7 +323,33 @@ public class AftersaleService {
             row.getRuleVersion(),
             utc(row.getCreatedAt()),
             utc(row.getUpdatedAt()),
-            events
+            events,
+            row.getReturnRegisteredAt() == null
+                ? null
+                : new AftersaleVO.ReturnShipment(
+                      row.getReturnCarrier(),
+                      row.getReturnTrackingNumber(),
+                      utc(row.getReturnRegisteredAt())
+                  ),
+            row.getReceivedAt() == null
+                ? null
+                : new AftersaleVO.Receipt(row.getReceiptNote(), utc(row.getReceivedAt())),
+            detail
+                ? refunds
+                      .list(row.getId())
+                      .stream()
+                      .map(r ->
+                          new RefundVO(
+                              r.requestKey(),
+                              r.operationNumber(),
+                              money(r.amount()),
+                              r.status(),
+                              utc(r.createdAt()),
+                              utc(r.updatedAt())
+                          )
+                      )
+                      .toList()
+                : List.of()
         );
     }
 
